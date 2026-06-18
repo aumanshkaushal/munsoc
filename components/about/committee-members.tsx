@@ -12,13 +12,14 @@ const committeeMembers = [
   { name: "Prabhleen", role: "" },
   { name: "Karthik", role: "" },
   { name: "Aumansh", role: "" },
+  { name: "Rahul", role: "" },
+  { name: "Satyam", role: "" },
 ];
 
 export default function CommitteeMembers() {
   return (
     <section className="bg-[#121212] py-20 px-4">
       <div className="max-w-5xl mx-auto">
-        
         <Reveal className="text-center mb-12">
           <h2
             className="font-display text-white"
