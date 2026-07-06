@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Reveal } from "@/components/motion";
-import { Sparkles, Check, ChevronDown } from "lucide-react";
+import { Sparkles, Check, ChevronDown, Smartphone } from "lucide-react";
 import QRCode from "qrcode";
 
 // CONFIGURATION: Payment URI
@@ -582,6 +582,13 @@ export default function AippmClient() {
                     {UPI_ID}
                   </span>
                 </div>
+                <a
+                  href={PAYMENT_URI}
+                  className="w-full mt-2 bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-[#0a0a0a] text-xs tracking-widest py-3 rounded-lg hover:bg-[#7dd3fc] transition-all duration-300 flex items-center justify-center gap-2 shadow-md shadow-[#38bdf8]/10"
+                >
+                  <Smartphone size={14} />
+                  OPEN IN UPI APP
+                </a>
               </div>
             </Reveal>
 
