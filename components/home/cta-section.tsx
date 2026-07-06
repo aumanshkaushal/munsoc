@@ -38,10 +38,10 @@ export default function CTASection() {
             className="mt-8 inline-block"
           >
             <Link
-              href="/join"
+              href="/committees/aippm"
               className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-semibold text-sm tracking-widest px-8 py-3 rounded hover:bg-[#7dd3fc] transition-colors inline-block shadow-lg shadow-[#38bdf8]/20"
             >
-              APPLY TO JOIN MUNSOC TODAY
+              PARTICIPATE NOW
             </Link>
           </motion.div>
         </Reveal>
