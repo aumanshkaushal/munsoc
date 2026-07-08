@@ -13,6 +13,8 @@ import {
   Trophy,
   Coins,
   Lock,
+  HelpCircle,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import QRCode from "qrcode";
@@ -452,6 +454,8 @@ export default function AippmClient() {
   const [isPaymentVerified, setIsPaymentVerified] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [modalStep, setModalStep] = useState(1); // 1 = QR Code, 2 = Enter Txn ID
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -464,6 +468,51 @@ export default function AippmClient() {
       textareaRef.current.style.height = `${Math.max(120, textareaRef.current.scrollHeight)}px`;
     }
   }, [formData.experience]);
+
+  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result?.toString().split(",")[1];
+        if (!base64String) {
+          showCustomAlert("Upload Failed", "Could not read receipt image data.");
+          setUploadingImage(false);
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ image: base64String }),
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success && data.refId) {
+            setFormData((prev) => ({ ...prev, transactionId: data.refId }));
+          } else {
+            showCustomAlert("Upload Failed", data.error || "Failed to process receipt image. Please try entering Transaction ID manually.");
+          }
+        } catch (err) {
+          console.error("Upload fetch error:", err);
+          showCustomAlert("Upload Failed", "Network error. Please try manually entering Transaction ID.");
+        } finally {
+          setUploadingImage(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("File read error:", err);
+      showCustomAlert("Upload Failed", "Failed to read local image file.");
+      setUploadingImage(false);
+    }
+  };
 
   const refreshAllottedPortfolios = async () => {
     try {
@@ -1205,19 +1254,78 @@ export default function AippmClient() {
 
                     <div className="w-full space-y-3.5">
                       <div>
-                        <label className="text-[9px] font-heading font-bold tracking-widest text-[#38bdf8] uppercase block mb-1">
-                          Transaction ID / Ref No.{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[9px] font-heading font-bold tracking-widest text-[#38bdf8] uppercase block">
+                            Transaction ID / Ref No. <span className="text-red-500">*</span> <span className="text-[7px] border border-[#38bdf8] text-[#38bdf8] font-bold px-1.5 py-0.5 rounded ml-1.5 tracking-normal normal-case font-heading">Recommended</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setIsHelpModalOpen(true)}
+                            className="text-[9px] text-[#38bdf8]/75 hover:text-[#38bdf8] transition-colors flex items-center gap-1 cursor-pointer font-bold tracking-wider uppercase font-heading"
+                          >
+                            <HelpCircle size={10} />
+                            <span>Where is this?</span>
+                          </button>
+                        </div>
                         <input
                           type="text"
                           name="transactionId"
                           value={formData.transactionId}
                           onChange={handleInputChange}
                           placeholder="e.g. 401234567890"
-                          className="w-full bg-[#121212] border border-white/8 rounded-lg px-4 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-[#38bdf8] transition-all font-mono"
+                          disabled={formData.transactionId.startsWith("MUNSOC-REF-")}
+                          className="w-full bg-[#121212] border border-[#38bdf8]/35 focus:border-[#38bdf8] rounded-lg px-4 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none transition-all font-mono disabled:opacity-45 disabled:cursor-not-allowed"
                           required
                         />
+                      </div>
+
+                      {/* Backup Upload Section */}
+                      <div className="pt-3.5 border-t border-white/5 mt-1.5">
+                        <span className="text-[9px] font-heading font-bold text-white/40 uppercase tracking-widest block mb-2 leading-relaxed">
+                          Still can't find it? Upload the screenshot instead:
+                        </span>
+                        <label className={`w-full bg-[#121212] border border-dashed rounded-lg px-4 py-3 flex flex-col items-center justify-center cursor-pointer transition-all ${uploadingImage ? 'opacity-50 cursor-not-allowed border-white/5' : 'border-white/10 hover:border-[#38bdf8]/40 hover:bg-[#38bdf8]/5'}`}>
+                          {uploadingImage ? (
+                            <div className="flex items-center gap-1.5 text-[11px] text-white/50 font-medium">
+                              <svg className="animate-spin h-3.5 w-3.5 text-[#38bdf8]" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                              Uploading receipt...
+                            </div>
+                          ) : formData.transactionId && formData.transactionId.startsWith("MUNSOC-REF-") ? (
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center gap-1.5 text-[11px] text-[#38bdf8] font-bold uppercase tracking-wider font-heading">
+                                <Check size={14} />
+                                Screenshot Loaded
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setFormData((prev) => ({ ...prev, transactionId: "" }));
+                                }}
+                                className="text-white/40 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                                title="Remove Screenshot"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-center select-none">
+                              <span className="text-[10px] text-white/40 block font-medium">Click to select receipt image</span>
+                              <span className="text-[8px] text-white/20 font-mono mt-0.5 block">JPG, PNG or WEBP</span>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingImage}
+                            onChange={handleScreenshotUpload}
+                            className="hidden"
+                          />
+                        </label>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 mt-4">
@@ -1355,6 +1463,52 @@ export default function AippmClient() {
                     OK
                   </button>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Help Modal showing Google Pay Receipt Example */}
+      <AnimatePresence>
+        {isHelpModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsHelpModalOpen(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[101] flex items-center justify-center p-4 cursor-pointer"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#1c1c1e] border border-white/10 rounded-2xl p-5 max-w-md w-full shadow-2xl relative cursor-default"
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setIsHelpModalOpen(false)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors cursor-pointer text-[10px] uppercase tracking-wider font-heading font-bold"
+              >
+                CLOSE
+              </button>
+
+              <h4 className="font-heading font-bold text-white text-xs tracking-wider uppercase mb-3 pr-10">
+                UPI Reference Number
+              </h4>
+              <p className="text-white/50 text-[10px] leading-relaxed mb-4">
+                Open your UPI payment transaction receipt. Find the 12-digit numeric reference ID labeled as <strong>UPI transaction ID</strong> or <strong>Ref No.</strong> as highlighted below:
+              </p>
+
+              {/* Receipt Image */}
+              <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black flex items-center justify-center max-h-[420px] overflow-y-auto scrollbar-none">
+                <img
+                  src="/UPI-Reference-Number-Google-Pay.jpeg.webp"
+                  alt="UPI Reference ID Example"
+                  className="w-full h-auto object-contain rounded"
+                />
               </div>
             </motion.div>
           </motion.div>

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { uploadRefMap } from "../shared";
 
 // CONFIGURATION: Set environment variables or defaults
 const GOOGLE_SHEET_WEBHOOK_URL = process.env.GOOGLE_SHEET_WEBHOOK_URL || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const NOTIFICATION_EMAILS = process.env.NOTIFICATION_EMAILS || "";
 const FROM_EMAIL = process.env.FROM_EMAIL || "onboarding@resend.dev";
+const IMGBB_API_KEY = process.env.IMGBB_API_KEY || "";
 
 // In-memory rate limiting store: client IP -> timestamps[]
 const rateLimitStore = new Map<string, number[]>();
@@ -60,10 +62,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Late upload screenshot to ImgBB if it is a reference ID
+    let resolvedTransactionId = transactionId;
+    if (transactionId.startsWith("MUNSOC-REF-")) {
+      const base64Image = uploadRefMap.get(transactionId);
+      if (base64Image && IMGBB_API_KEY) {
+        try {
+          const bodyParams = new URLSearchParams();
+          bodyParams.append("image", base64Image);
+
+          const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: bodyParams,
+          });
+
+          const uploadResult = await response.json();
+          if (uploadResult.success && uploadResult.data && uploadResult.data.url) {
+            resolvedTransactionId = uploadResult.data.url;
+          } else {
+            console.error("[MUNSoC Register] Late upload ImgBB API error:", uploadResult);
+          }
+        } catch (uploadError) {
+          console.error("[MUNSoC Register] Late upload to ImgBB failed:", uploadError);
+        }
+      }
+    }
+
     if (!GOOGLE_SHEET_WEBHOOK_URL) {
       console.warn("[MUNSoC Register] Warning: GOOGLE_SHEET_WEBHOOK_URL is not set.");
       // If not configured, we simulate a successful submission for frontend preview
       recordSubmission(ip); // Log submission
+      if (transactionId.startsWith("MUNSOC-REF-")) {
+        uploadRefMap.delete(transactionId); // Clean up memory mapping
+      }
       return NextResponse.json({
         success: true,
         message: "Demo mode: Registration received. (Please set GOOGLE_SHEET_WEBHOOK_URL in .env.local for Sheets sync)",
@@ -85,7 +119,7 @@ export async function POST(req: NextRequest) {
         pref2,
         pref3,
         experience: experience || "",
-        transactionId,
+        transactionId: resolvedTransactionId, // Write the resolved ImgBB URL to the sheet
         timestamp: new Date().toISOString(),
       }),
     });
@@ -95,6 +129,11 @@ export async function POST(req: NextRequest) {
     if (result.result === "success") {
       // Record this submission in the rate limiter
       recordSubmission(ip);
+
+      // Clean up reference mapping from memory
+      if (transactionId.startsWith("MUNSOC-REF-")) {
+        uploadRefMap.delete(transactionId);
+      }
 
       // Dispatch Resend email notification if configured
       if (RESEND_API_KEY && NOTIFICATION_EMAILS) {
@@ -153,7 +192,7 @@ export async function POST(req: NextRequest) {
                       </tr>
                       <tr style="border-bottom: 1px solid #e2e8f0;">
                         <td style="padding: 10px; font-weight: bold; border-right: 1px solid #e2e8f0; background-color: #fcfcfc;">Transaction ID</td>
-                        <td style="padding: 10px; font-family: monospace; font-weight: 600; color: #0f172a;">${transactionId}</td>
+                        <td style="padding: 10px; font-family: monospace; font-weight: 600; color: #0f172a;">${resolvedTransactionId}</td>
                       </tr>
                       <tr>
                         <td style="padding: 10px; font-weight: bold; border-right: 1px solid #e2e8f0; background-color: #fcfcfc; vertical-align: top;">MUN Experience</td>
