@@ -15,11 +15,57 @@ const MAX_SUBMISSIONS = 3;
 // Stores past submission bodies per IP for rate limit alert
 const rateLimitSubmissionLog = new Map<string, { timestamp: string; body: Record<string, string> }[]>();
 
+let lastCleanup = Date.now();
+const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
+
+function cleanupStores() {
+  const now = Date.now();
+  for (const [ip, timestamps] of rateLimitStore.entries()) {
+    const active = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW);
+    if (active.length === 0) {
+      rateLimitStore.delete(ip);
+    } else if (active.length !== timestamps.length) {
+      rateLimitStore.set(ip, active);
+    }
+  }
+  for (const [ip, log] of rateLimitSubmissionLog.entries()) {
+    const active = log.filter((s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW);
+    if (active.length === 0) {
+      rateLimitSubmissionLog.delete(ip);
+    } else if (active.length !== log.length) {
+      rateLimitSubmissionLog.set(ip, active);
+    }
+  }
+}
+
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Periodic cleanup of all expired entries
+  if (now - lastCleanup > CLEANUP_INTERVAL) {
+    cleanupStores();
+    lastCleanup = now;
+  }
+
   const timestamps = rateLimitStore.get(ip) || [];
   const activeTimestamps = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW);
-  rateLimitStore.set(ip, activeTimestamps);
+  if (activeTimestamps.length === 0) {
+    rateLimitStore.delete(ip);
+  } else {
+    rateLimitStore.set(ip, activeTimestamps);
+  }
+
+  // Dynamic cleanup for current IP's submission log if expired
+  const log = rateLimitSubmissionLog.get(ip);
+  if (log) {
+    const activeLog = log.filter((s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW);
+    if (activeLog.length === 0) {
+      rateLimitSubmissionLog.delete(ip);
+    } else if (activeLog.length !== log.length) {
+      rateLimitSubmissionLog.set(ip, activeLog);
+    }
+  }
+
   return activeTimestamps.length >= MAX_SUBMISSIONS;
 }
 
@@ -96,9 +142,14 @@ async function sendRateLimitAlert(
       .map(([k, v]) => `<tr><td style="padding: 6px 8px; font-weight:600; color:#64748b; font-size:11px; white-space:nowrap;">${escapeHtml(k)}</td><td style="padding: 6px 8px; font-family:monospace; font-size:11px; word-break:break-all;">${escapeHtml(v)}</td></tr>`)
       .join("");
 
+    const alertRecipients = (NOTIFICATION_EMAILS || "nitjmunsoc@gmail.com")
+      .split(",")
+      .map((e) => e.trim())
+      .filter((e) => e.length > 0);
+
     await resend.emails.send({
       from: FROM_EMAIL,
-      to: ["nitjmunsoc@gmail.com"],
+      to: alertRecipients,
       subject: `⚠️ AIPPM Rate Limit Hit — IP: ${escapeHtml(ip)}`,
       html: `
         <div style="font-family: sans-serif; max-width: 700px; color: #1e293b;">
@@ -166,7 +217,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Fire-and-forget alert to nitjmunsoc@gmail.com
-      sendRateLimitAlert(ip, headerMap, blockedBody);
+      await sendRateLimitAlert(ip, headerMap, blockedBody);
 
       return NextResponse.json(
         { success: false, error: "Rate limit exceeded. Maximum 3 submissions per hour allowed." },
@@ -174,17 +225,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Size check for general registration body to prevent DoS
-    const mainContentLengthHeader = req.headers.get("content-length");
-    const mainContentLength = mainContentLengthHeader ? parseInt(mainContentLengthHeader, 10) : 0;
-    if (mainContentLength > 10240) {
+    // Size check for general registration body to prevent DoS (do not rely solely on Content-Length)
+    const rawBody = await req.text();
+    if (rawBody.length > 10240) {
       return NextResponse.json(
         { success: false, error: "Payload too large." },
         { status: 413 }
       );
     }
 
-    const body = await req.json();
+    let body: Record<string, any>;
+    try {
+      body = JSON.parse(rawBody || "{}");
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Invalid JSON payload." },
+        { status: 400 }
+      );
+    }
     const { name, email, whatsapp, institute, pref1, pref2, pref3, experience, transactionId } = body;
 
     if (GOOGLE_SHEET_WEBHOOK_URL) {
@@ -194,7 +252,9 @@ export async function POST(req: NextRequest) {
           cache: "no-store",
         });
         const checkResult = await checkResponse.json();
-        if (checkResult.result === "success" && checkResult.allotted && checkResult.allotted.length >= 88) {
+        const portfolioLimit = 88;
+        const allottedCount = Array.isArray(checkResult.allotted) ? checkResult.allotted.length : 0;
+        if (checkResult.result === "success" && allottedCount >= portfolioLimit) {
           return NextResponse.json(
             { success: false, error: "Registrations are closed because all delegate portfolios have been allotted." },
             { status: 403 }
