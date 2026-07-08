@@ -30,8 +30,10 @@ function recordSubmission(ip: string, body: Record<string, string>) {
   rateLimitStore.set(ip, timestamps);
 
   const log = rateLimitSubmissionLog.get(ip) || [];
-  log.push({ timestamp: new Date(now).toISOString(), body });
-  rateLimitSubmissionLog.set(ip, log);
+  const nextLog = [...log, { timestamp: new Date(now).toISOString(), body }]
+    .filter((s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW)
+    .slice(-MAX_SUBMISSIONS);
+  rateLimitSubmissionLog.set(ip, nextLog);
 }
 
 async function sendRateLimitAlert(
