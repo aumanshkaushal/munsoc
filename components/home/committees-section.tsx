@@ -9,6 +9,7 @@ import {
   Lock,
   ArrowRight,
   MessageCircle,
+  MapPin,
 } from "lucide-react";
 import { Reveal, Stagger, StaggerItem, CountUp } from "@/components/motion";
 import { motion } from "motion/react";
@@ -16,7 +17,7 @@ import { motion } from "motion/react";
 const committees = [
   {
     code: "AIPPM",
-    name: "Online Model-UN (AIPPM)",
+    name: "All India Political Parties Meet (AIPPM)",
     organizer: "MUNSoC NITJ",
     desc: "All India Political Parties Meet, simulating Indian political debates and policy negotiations on crucial national topics.",
     href: "/committees/aippm",
@@ -67,9 +68,15 @@ export default function CommitteesSection() {
                 <Link href={c.href} className="absolute inset-0 z-10" aria-label={`View ${c.name}`} />
                 <div>
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-[#38bdf8] text-[9px] font-heading font-semibold tracking-widest uppercase">
-                      {c.organizer}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[#38bdf8] text-[9px] font-heading font-semibold tracking-widest uppercase">
+                        {c.organizer}
+                      </span>
+                      <span className="text-white/40 text-[9px] font-heading font-medium tracking-wider flex items-center gap-1 uppercase">
+                        <MapPin size={8} className="text-[#38bdf8]" />
+                        Online
+                      </span>
+                    </div>
                     <span className="bg-[#38bdf8]/15 text-[#38bdf8] text-[9px] font-heading font-semibold tracking-widest px-2 py-0.5 rounded border border-[#38bdf8]/20">
                       {c.code}
                     </span>
