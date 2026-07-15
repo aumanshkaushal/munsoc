@@ -11,7 +11,7 @@ const navLinks = [
   { href: '/', label: 'HOME' },
   { href: '/about', label: 'ABOUT US' },
   { href: '/committees', label: 'COMMITTEES' },
-  { href: '/join', label: 'JOIN US' },
+  { href: '/contact', label: 'CONTACT US' },
 ]
 
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -82,10 +82,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center">
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={{ duration: 0.2 }}>
               <Link
-                href="/join"
+                href="/contact"
                 className="border border-white/30 text-white text-xs font-heading font-semibold tracking-widest px-4 py-1.5 rounded hover:border-[#38bdf8] hover:text-[#38bdf8] hover:bg-[#38bdf8]/5 transition-colors duration-200"
               >
-                COMING SOON
+                CONTACT US
               </Link>
             </motion.div>
           </div>
@@ -132,11 +132,11 @@ export default function Navbar() {
                 )
               })}
               <Link
-                href="/join"
+                href="/contact"
                 onClick={() => setMobileOpen(false)}
                 className="border border-white/30 text-white text-xs font-heading font-semibold tracking-widest px-4 py-2 rounded text-center hover:border-[#38bdf8] hover:text-[#38bdf8] transition-colors"
               >
-                COMING SOON
+                CONTACT US
               </Link>
             </div>
           </motion.div>
