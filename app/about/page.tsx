@@ -21,7 +21,6 @@ export default function AboutPage() {
       <Navbar />
 
       <section className="relative pt-32 pb-20 px-4 bg-[#0a0a0a] overflow-hidden">
-        
         <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none overflow-hidden">
           <span
             className="font-heading font-bold text-white/[0.03] tracking-tighter whitespace-nowrap"

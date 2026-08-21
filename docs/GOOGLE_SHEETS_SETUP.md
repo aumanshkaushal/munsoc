@@ -8,7 +8,7 @@ This guide explains how the MUNSoC Web Platform integrates with Google Sheets an
 
 1. Open or create your Google Spreadsheet (e.g. `MUNSoC YPM 2026 Registrations`).
 2. Click **Extensions** > **Apps Script** in the top navigation bar (or open [script.google.com](https://script.google.com)).
-3. Open [`scripts/google-sheets-handler.js`](file:///home/karthik-kanithi/Documents/munsoc/scripts/google-sheets-handler.js) from this repository, copy its entire contents, and paste it into the Apps Script editor.
+3. Open [`scripts/google-sheets-handler.js`](../scripts/google-sheets-handler.js) from this repository, copy its entire contents, and paste it into the Apps Script editor.
 4. If running as a standalone script outside the sheet, set `const SPREADSHEET_ID = "..."` at line 30 with your sheet URL or ID.
 5. Click the **Save** icon (diskette).
 6. Select **`setupSheets`** from the function dropdown in the toolbar and click **Run**. Grant authorization when prompted. This creates:
@@ -59,7 +59,7 @@ All emails are dispatched directly by Google Apps Script without requiring any e
    - Dispatched automatically to the delegate's email upon submission confirming that their registration and payment details have been received and are under review.
 
 3. **Portfolio Allotment Confirmation Email**:
-   - Dispatched to delegates when the Secretariat fills in *Allotted Portfolio* (Column L), sets *Status* (Column M) to `Allotted` or `Confirmed`, and triggers **🏛️ MUNSoC Platform > 📧 Send Allotment Confirmation Emails** from the Google Sheet toolbar.
+   - Dispatched to delegates when the Secretariat fills in _Allotted Portfolio_ (Column L), sets _Status_ (Column M) to `Allotted` or `Confirmed`, and triggers **🏛️ MUNSoC Platform > 📧 Send Allotment Confirmation Emails** from the Google Sheet toolbar.
 
 4. **Security & Rate Limit Alert Email**:
    - Sent to the Secretariat if suspicious rapid submission patterns or rate-limit violations occur.

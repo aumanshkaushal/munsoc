@@ -24,11 +24,13 @@ The MUNSoC web platform empowers delegates and organizers with an end-to-end con
 ## ✨ Key Features
 
 ### 🏛️ Youth Parliament (YPM) Delegate Registration
+
 - **Interactive Portfolio Picker**: Multi-tier preference selection with real-time portfolio availability indicators.
 - **Payment Verification**: Integrated UPI QR payments, transaction ID validation, and automated receipt image hosting via ImgBB.
 - **Dynamic Capacity Management**: Automatically closes registration when portfolio limits are met.
 
 ### 📊 Real-Time Google Sheets Backend
+
 - **Live Two-Way Synchronization**: Form submissions append directly to Google Sheets with script concurrency locking.
 - **Custom Spreadsheet UI Menu (`🏛️ MUNSoC Platform`)**:
   - `🚀 Initialize / Format Sheets & Dropdowns` — One-click setup for headers, conditional color pills, and validations.
@@ -38,6 +40,7 @@ The MUNSoC web platform empowers delegates and organizers with an end-to-end con
 - **Dropdown & Color Badges**: Preconfigured status indicators (`Pending` 🟡, `Allotted` 🔵, `Confirmed` 🟢, `Waitlisted` 🟠, `Rejected` 🔴, `Cancelled` ⚪).
 
 ### 📧 Automated Email Notification Pipeline (Google Apps Script)
+
 - **High-Deliverability via `GmailApp`**: Dispatched directly with SPF/DKIM authentication and multipart HTML/plain-text fallbacks to prevent spam flagging.
 - **Delegate Acknowledgment Receipts**: Sent automatically upon form submission.
 - **Secretariat Alerts**: Instant notifications sent to `nitjmunsoc@gmail.com` with complete registration metadata.
@@ -45,9 +48,11 @@ The MUNSoC web platform empowers delegates and organizers with an end-to-end con
 - **Security & Rate-Limit Alerts**: Automated diagnostic alerts sent if suspicious submission bursts occur.
 
 ### 🔗 Campaign Referral Tracking (`?ref=...`)
+
 - **Built-in Link Tracking**: Captures marketing campaign clicks (e.g. `/?ref=instagram_promo`) and logs timestamps, IP, city, region, country, and user-agent into a dedicated `Referrals` Google Sheet.
 
 ### 🛡️ Security & Rate Limiting
+
 - **Rolling Rate Limiter**: Limits submissions to 3 per hour per IP address to prevent bot abuse.
 - **Webhook Authentication**: Protected with a shared HMAC secret (`WEBHOOK_SECRET`) between Next.js and Google Apps Script.
 
@@ -105,27 +110,33 @@ munsoc/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Node.js**: `v20.x` or later
 - **npm** or **pnpm**
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Opensource-NITJ/munsoc.git
 cd munsoc
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Setup Environment Variables
+
 Copy `.env.example` to `.env.local`:
+
 ```bash
 cp .env.example .env.local
 ```
 
 Configure the following variables in `.env.local`:
+
 ```env
 # Google Sheets Webhook Deployment URL
 GOOGLE_SHEET_WEBHOOK_URL="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"
@@ -142,12 +153,15 @@ IMGBB_API_KEY="your_imgbb_api_key"
 ```
 
 ### 4. Run Development Server
+
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### 5. Build for Production
+
 ```bash
 npm run build
 npm start

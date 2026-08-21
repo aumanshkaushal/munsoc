@@ -2,7 +2,7 @@
  * ==============================================================================
  * MUNSoC NIT Jalandhar — Google Sheets Webhook Handler (Google Apps Script)
  * ==============================================================================
- * 
+ *
  * FEATURES:
  * 1. Webhook Endpoint: Receives delegate registrations from Next.js backend.
  * 2. Concurrency Safety: LockService prevents simultaneous write race conditions.
@@ -17,7 +17,7 @@
  *    - Email Sent Column (Column N): ["No", "Yes"]
  *    - Color-coded conditional formatting rules for all status pills.
  * 6. UI Toolbar Menu: One-click sheet formatter, allotment dispatcher, status checker.
- * 
+ *
  * ==============================================================================
  */
 
@@ -30,14 +30,15 @@
  * paste your Google Sheet ID or full URL below.
  * If you opened this via "Extensions > Apps Script" inside the Sheet, leave this empty ("").
  */
-const SPREADSHEET_ID = ""; 
+const SPREADSHEET_ID = "";
 
 // Recipient email(s) for Secretariat notifications & security alerts
 const NOTIFICATION_EMAILS = "nitjmunsoc@gmail.com";
 
 // Shared secret — must match WEBHOOK_SECRET in Next.js .env.local
-const WEBHOOK_SECRET = "d911246e7d248f3e2f593d49819ed8490f26d59c9afc13c219c59bf5c005f95d";
 
+const WEBHOOK_SECRET =
+  PropertiesService.getScriptProperties().getProperty("WEBHOOK_SECRET") || "";
 const SHEET_REGISTRATIONS = "Registrations";
 const SHEET_REFERRALS = "Referrals";
 const DEFAULT_PORTFOLIO_LIMIT = 65; // Default portfolio limit for YPM
@@ -49,14 +50,11 @@ const STATUS_OPTIONS = [
   "Confirmed",
   "Waitlisted",
   "Rejected",
-  "Cancelled"
+  "Cancelled",
 ];
 
 // Email Sent Dropdown Options
-const EMAIL_SENT_OPTIONS = [
-  "No",
-  "Yes"
-];
+const EMAIL_SENT_OPTIONS = ["No", "Yes"];
 
 // Registration Sheet Column Headers (15 Columns)
 const REGISTRATION_HEADERS = [
@@ -74,7 +72,7 @@ const REGISTRATION_HEADERS = [
   "Allotted Portfolio",
   "Status",
   "Email Sent",
-  "Email Sent At"
+  "Email Sent At",
 ];
 
 // Referral Tracking Column Headers (10 Columns)
@@ -88,7 +86,7 @@ const REFERRAL_HEADERS = [
   "Country",
   "User Agent",
   "Referer",
-  "Language"
+  "Language",
 ];
 
 // ==============================================================================
@@ -109,7 +107,10 @@ function getSpreadsheet() {
       }
       return SpreadsheetApp.openById(target);
     } catch (err) {
-      Logger.log("[MUNSoC] Error opening spreadsheet by SPREADSHEET_ID: " + err.toString());
+      Logger.log(
+        "[MUNSoC] Error opening spreadsheet by SPREADSHEET_ID: " +
+          err.toString(),
+      );
     }
   }
 
@@ -143,7 +144,7 @@ function getSpreadsheet() {
   }
 
   throw new Error(
-    "Could not bind to Google Spreadsheet. If this script is a standalone script (from script.google.com), please paste your Google Sheet URL or ID into the SPREADSHEET_ID constant at line 31 of this script."
+    "Could not bind to Google Spreadsheet. If this script is a standalone script (from script.google.com), please paste your Google Sheet URL or ID into the SPREADSHEET_ID constant at line 31 of this script.",
   );
 }
 
@@ -186,7 +187,10 @@ function onOpen() {
     const ui = SpreadsheetApp.getUi();
     ui.createMenu("🏛️ MUNSoC Platform")
       .addItem("🚀 Initialize / Format Sheets & Dropdowns", "setupSheets")
-      .addItem("🔧 Fill Missing Status & Email Sent Defaults", "initializeDefaultValues")
+      .addItem(
+        "🔧 Fill Missing Status & Email Sent Defaults",
+        "initializeDefaultValues",
+      )
       .addItem("📧 Send Allotment Confirmation Emails", "sendAllotmentEmails")
       .addItem("📊 Check Allotment Count & Status", "checkAllotmentStatus")
       .addToUi();
@@ -209,7 +213,11 @@ function doGet(e) {
 
     // Authenticate: reject requests without the correct shared secret
     if (WEBHOOK_SECRET && params.secret !== WEBHOOK_SECRET) {
-      return jsonResponse({ result: "error", status: "error", error: "Unauthorized" });
+      return jsonResponse({
+        result: "error",
+        status: "error",
+        error: "Unauthorized",
+      });
     }
 
     const action = params.action || params.type || "allotted";
@@ -218,7 +226,7 @@ function doGet(e) {
       return jsonResponse({
         result: "success",
         status: "ok",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -234,7 +242,7 @@ function doGet(e) {
         totalAllotted: 0,
         portfolioLimit: DEFAULT_PORTFOLIO_LIMIT,
         isClosed: false,
-        message: "Registrations sheet not initialized yet."
+        message: "Registrations sheet not initialized yet.",
       });
     }
 
@@ -247,10 +255,16 @@ function doGet(e) {
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
         const allottedPortfolio = String(row[11] || "").trim(); // Col L: Allotted Portfolio
-        const status = String(row[12] || "").trim().toLowerCase(); // Col M: Status
+        const status = String(row[12] || "")
+          .trim()
+          .toLowerCase(); // Col M: Status
 
         // Count as taken if portfolio is filled and not cancelled/rejected
-        if (allottedPortfolio && status !== "cancelled" && status !== "rejected") {
+        if (
+          allottedPortfolio &&
+          status !== "cancelled" &&
+          status !== "rejected"
+        ) {
           allottedPortfolios.push(allottedPortfolio);
         }
       }
@@ -266,14 +280,13 @@ function doGet(e) {
       totalAllotted: allottedPortfolios.length,
       portfolioLimit: DEFAULT_PORTFOLIO_LIMIT,
       isClosed: isClosed,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     return jsonResponse({
       result: "error",
       status: "error",
-      error: error.toString()
+      error: error.toString(),
     });
   }
 }
@@ -294,7 +307,7 @@ function doPost(e) {
     return jsonResponse({
       result: "error",
       status: "error",
-      error: "Server busy. Please retry in a few seconds."
+      error: "Server busy. Please retry in a few seconds.",
     });
   }
 
@@ -303,7 +316,7 @@ function doPost(e) {
       return jsonResponse({
         result: "error",
         status: "error",
-        error: "No POST body received."
+        error: "No POST body received.",
       });
     }
 
@@ -314,13 +327,17 @@ function doPost(e) {
       return jsonResponse({
         result: "error",
         status: "error",
-        error: "Malformed JSON payload: " + parseError.toString()
+        error: "Malformed JSON payload: " + parseError.toString(),
       });
     }
 
     // Authenticate: reject requests without the correct shared secret
     if (WEBHOOK_SECRET && payload.secret !== WEBHOOK_SECRET) {
-      return jsonResponse({ result: "error", status: "error", error: "Unauthorized" });
+      return jsonResponse({
+        result: "error",
+        status: "error",
+        error: "Unauthorized",
+      });
     }
 
     const ss = getSpreadsheet();
@@ -337,12 +354,11 @@ function doPost(e) {
 
     // 3. Delegate Registration Handler
     return handleRegistration(ss, payload);
-
   } catch (error) {
     return jsonResponse({
       result: "error",
       status: "error",
-      error: error.toString()
+      error: error.toString(),
     });
   } finally {
     lock.releaseLock();
@@ -370,14 +386,17 @@ function handleRegistration(ss, payload) {
   const pref3 = String(payload.pref3 || "").trim();
   const experience = String(payload.experience || "").trim();
   const transactionId = String(payload.transactionId || "").trim();
-  const committee = String(payload.committee || "Youth Parliament (YPM)").trim();
+  const committee = String(
+    payload.committee || "Youth Parliament (YPM)",
+  ).trim();
 
   // Basic validation
   if (!name || !email || !pref1 || !transactionId) {
     return jsonResponse({
       result: "error",
       status: "error",
-      error: "Missing required registration fields (name, email, pref1, or transactionId)."
+      error:
+        "Missing required registration fields (name, email, pref1, or transactionId).",
     });
   }
 
@@ -394,10 +413,10 @@ function handleRegistration(ss, payload) {
     experience,
     transactionId,
     committee,
-    "",        // Col L: Allotted Portfolio (Filled by Secretariat)
+    "", // Col L: Allotted Portfolio (Filled by Secretariat)
     "Pending", // Col M: Status Dropdown ("Pending", "Allotted", "Confirmed", "Waitlisted", "Rejected", "Cancelled")
-    "No",      // Col N: Email Sent ("No", "Yes")
-    ""         // Col O: Email Sent At
+    "No", // Col N: Email Sent ("No", "Yes")
+    "", // Col O: Email Sent At
   ];
 
   sheet.appendRow(rowData);
@@ -432,21 +451,26 @@ function handleRegistration(ss, payload) {
   try {
     sendRegistrationNotificationToSecretariat(payload);
   } catch (emailErr) {
-    Logger.log("[MUNSoC] Secretariat notification failed: " + emailErr.toString());
+    Logger.log(
+      "[MUNSoC] Secretariat notification failed: " + emailErr.toString(),
+    );
   }
 
   // 2. Send Acknowledgment Email to Delegate
   try {
     sendRegistrationAcknowledgmentToDelegate(payload);
   } catch (delegateEmailErr) {
-    Logger.log("[MUNSoC] Delegate acknowledgment email failed: " + delegateEmailErr.toString());
+    Logger.log(
+      "[MUNSoC] Delegate acknowledgment email failed: " +
+        delegateEmailErr.toString(),
+    );
   }
 
   return jsonResponse({
     result: "success",
     status: "success",
     message: "Registration recorded successfully.",
-    row: lastRow
+    row: lastRow,
   });
 }
 
@@ -481,7 +505,7 @@ function sendEmailSafely(to, subject, htmlBody, plainTextBody) {
   const options = {
     htmlBody: htmlBody,
     name: senderName,
-    replyTo: replyToAddress
+    replyTo: replyToAddress,
   };
 
   try {
@@ -490,7 +514,9 @@ function sendEmailSafely(to, subject, htmlBody, plainTextBody) {
       return true;
     }
   } catch (gmailErr) {
-    Logger.log("[MUNSoC] GmailApp failed, trying MailApp: " + gmailErr.toString());
+    Logger.log(
+      "[MUNSoC] GmailApp failed, trying MailApp: " + gmailErr.toString(),
+    );
   }
 
   MailApp.sendEmail({
@@ -499,7 +525,7 @@ function sendEmailSafely(to, subject, htmlBody, plainTextBody) {
     body: plainTextBody,
     htmlBody: htmlBody,
     name: senderName,
-    replyTo: replyToAddress
+    replyTo: replyToAddress,
   });
   return true;
 }
@@ -642,8 +668,12 @@ function handleRateLimitAlert(payload) {
   const currentBody = payload.currentBody || {};
   const headers = payload.headers || {};
 
-  const submissionsHtml = [...pastSubmissions, { timestamp: new Date().toISOString(), body: currentBody }]
-    .map((s, i) => `
+  const submissionsHtml = [
+    ...pastSubmissions,
+    { timestamp: new Date().toISOString(), body: currentBody },
+  ]
+    .map(
+      (s, i) => `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 8px; font-weight: bold; color: #64748b; vertical-align: top;">#${i + 1}</td>
         <td style="padding: 8px; font-family: monospace; font-size: 11px; color: #64748b; vertical-align: top;">${escapeHtml(s.timestamp)}</td>
@@ -653,11 +683,15 @@ function handleRateLimitAlert(payload) {
           <b>WhatsApp:</b> ${escapeHtml((s.body && s.body.whatsapp) || "—")}<br/>
           <b>TxnID:</b> <span style="font-family:monospace">${escapeHtml((s.body && s.body.transactionId) || "—")}</span>
         </td>
-      </tr>`
-    ).join("");
+      </tr>`,
+    )
+    .join("");
 
   const headersHtml = Object.entries(headers)
-    .map(([k, v]) => `<tr><td style="padding: 6px 8px; font-weight:600; color:#64748b; font-size:11px;">${escapeHtml(k)}</td><td style="padding: 6px 8px; font-family:monospace; font-size:11px;">${escapeHtml(v)}</td></tr>`)
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding: 6px 8px; font-weight:600; color:#64748b; font-size:11px;">${escapeHtml(k)}</td><td style="padding: 6px 8px; font-family:monospace; font-size:11px;">${escapeHtml(v)}</td></tr>`,
+    )
     .join("");
 
   const subject = `Security Alert: Registration Rate Limit Exceeded — IP: ${ip}`;
@@ -685,7 +719,7 @@ function handleRateLimitAlert(payload) {
   return jsonResponse({
     result: "success",
     status: "success",
-    message: "Rate limit alert sent."
+    message: "Rate limit alert sent.",
   });
 }
 
@@ -720,7 +754,7 @@ function handleReferralTracking(ss, payload) {
     country,
     userAgent,
     referer,
-    language
+    language,
   ];
 
   sheet.appendRow(rowData);
@@ -735,7 +769,7 @@ function handleReferralTracking(ss, payload) {
     result: "success",
     status: "success",
     message: "Referral tracking logged.",
-    row: lastRow
+    row: lastRow,
   });
 }
 
@@ -773,8 +807,12 @@ function sendAllotmentEmails() {
     const pref1 = String(data[i][5] || "").trim();
     const committee = String(data[i][10] || "Youth Parliament (YPM)").trim();
     let allottedPortfolio = String(data[i][11] || "").trim();
-    const status = String(data[i][12] || "").trim().toLowerCase();
-    const emailSent = String(data[i][13] || "").trim().toLowerCase();
+    const status = String(data[i][12] || "")
+      .trim()
+      .toLowerCase();
+    const emailSent = String(data[i][13] || "")
+      .trim()
+      .toLowerCase();
 
     // Send if status is 'allotted' or 'confirmed', and email has not been sent yet
     const isAllottedStatus = status === "allotted" || status === "confirmed";
@@ -832,9 +870,13 @@ function sendAllotmentEmails() {
         sheet.getRange(rowIndex, 14).setValue("Yes");
         sheet.getRange(rowIndex, 15).setValue(new Date().toISOString());
         sentCount++;
-
       } catch (emailError) {
-        Logger.log("[MUNSoC] Failed to send email to " + email + ": " + emailError.toString());
+        Logger.log(
+          "[MUNSoC] Failed to send email to " +
+            email +
+            ": " +
+            emailError.toString(),
+        );
       }
     } else {
       skippedCount++;
@@ -843,7 +885,7 @@ function sendAllotmentEmails() {
 
   safeAlert(
     "Email Dispatch Complete",
-    `Allotment emails sent: ${sentCount}\nSkipped (Pending/Already Sent): ${skippedCount}`
+    `Allotment emails sent: ${sentCount}\nSkipped (Pending/Already Sent): ${skippedCount}`,
   );
 }
 
@@ -877,20 +919,25 @@ function debugAllotmentRows() {
     const pref1 = String(data[i][5] || "").trim();
     let allottedPortfolio = String(data[i][11] || "").trim();
     const statusRaw = data[i][12];
-    const status = String(statusRaw || "").trim().toLowerCase();
+    const status = String(statusRaw || "")
+      .trim()
+      .toLowerCase();
     const emailSentRaw = data[i][13];
-    const emailSent = String(emailSentRaw || "").trim().toLowerCase();
+    const emailSent = String(emailSentRaw || "")
+      .trim()
+      .toLowerCase();
 
     const isAllottedStatus = status === "allotted" || status === "confirmed";
-    const effectivePortfolio = allottedPortfolio || (isAllottedStatus ? pref1 : "");
+    const effectivePortfolio =
+      allottedPortfolio || (isAllottedStatus ? pref1 : "");
     const hasPortfolio = !!effectivePortfolio;
     const notYetSent = emailSent !== "yes";
     const wouldSend = hasPortfolio && isAllottedStatus && notYetSent;
 
     lines.push(
       `Row ${rowIndex}: ${name} | portfolio="${effectivePortfolio}" (${allottedPortfolio ? "Custom" : "Fallback Pref1"}) | ` +
-      `status="${status}" (${isAllottedStatus}) | emailSent="${emailSent}" (${notYetSent}) | ` +
-      `→ WOULD SEND: ${wouldSend}`
+        `status="${status}" (${isAllottedStatus}) | emailSent="${emailSent}" (${notYetSent}) | ` +
+        `→ WOULD SEND: ${wouldSend}`,
     );
     Logger.log(lines[lines.length - 1]);
   }
@@ -925,7 +972,9 @@ function checkAllotmentStatus() {
 
   for (let i = 0; i < data.length; i++) {
     const portfolio = String(data[i][11] || "").trim();
-    const status = String(data[i][12] || "").trim().toLowerCase();
+    const status = String(data[i][12] || "")
+      .trim()
+      .toLowerCase();
 
     if (portfolio) allotted++;
     if (status === "confirmed") confirmed++;
@@ -935,7 +984,7 @@ function checkAllotmentStatus() {
 
   safeAlert(
     "📊 Allotment Status",
-    `Total Registrations: ${total}\nPortfolios Allotted: ${allotted} / ${DEFAULT_PORTFOLIO_LIMIT}\nConfirmed: ${confirmed}\nPending: ${pending}\nRejected: ${rejected}\nCapacity Remaining: ${Math.max(0, DEFAULT_PORTFOLIO_LIMIT - allotted)}`
+    `Total Registrations: ${total}\nPortfolios Allotted: ${allotted} / ${DEFAULT_PORTFOLIO_LIMIT}\nConfirmed: ${confirmed}\nPending: ${pending}\nRejected: ${rejected}\nCapacity Remaining: ${Math.max(0, DEFAULT_PORTFOLIO_LIMIT - allotted)}`,
   );
 }
 
@@ -978,7 +1027,9 @@ function setupSheets() {
 
   safeAlert(
     "Setup Complete",
-    "MUNSoC Sheets initialized successfully in '" + ss.getName() + "' with Status dropdowns, color formatting, and default values."
+    "MUNSoC Sheets initialized successfully in '" +
+      ss.getName() +
+      "' with Status dropdowns, color formatting, and default values.",
   );
 }
 
@@ -1023,12 +1074,14 @@ function initializeDefaultValues(sheet) {
 
   if (changed > 0) {
     dataRange.setValues(values);
-    Logger.log("[MUNSoC] initializeDefaultValues: filled " + changed + " empty cell(s).");
+    Logger.log(
+      "[MUNSoC] initializeDefaultValues: filled " + changed + " empty cell(s).",
+    );
   }
 
   safeAlert(
     "Defaults Initialized",
-    `Checked ${values.length} registration row(s).\nUpdated ${changed} blank cell(s) with defaults:\n\n• Status → "Pending"\n• Email Sent → "No"`
+    `Checked ${values.length} registration row(s).\nUpdated ${changed} blank cell(s) with defaults:\n\n• Status → "Pending"\n• Email Sent → "No"`,
   );
 }
 
@@ -1064,7 +1117,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#fef9c3")
       .setFontColor("#854d0e")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Allotted -> Soft Sky Blue
@@ -1074,7 +1127,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#e0f2fe")
       .setFontColor("#0369a1")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Confirmed -> Soft Green
@@ -1084,7 +1137,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#dcfce7")
       .setFontColor("#15803d")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Waitlisted -> Soft Orange
@@ -1094,7 +1147,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#ffedd5")
       .setFontColor("#9a3412")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Rejected -> Soft Red
@@ -1104,7 +1157,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#fee2e2")
       .setFontColor("#991b1b")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Cancelled -> Soft Slate
@@ -1114,7 +1167,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#f1f5f9")
       .setFontColor("#475569")
       .setRanges([statusRange])
-      .build()
+      .build(),
   );
 
   // Email Sent -> Yes (Green)
@@ -1124,7 +1177,7 @@ function applyDropdownsAndFormatting(sheet) {
       .setBackground("#dcfce7")
       .setFontColor("#15803d")
       .setRanges([emailSentRange])
-      .build()
+      .build(),
   );
 
   sheet.setConditionalFormatRules(rules);
@@ -1135,7 +1188,7 @@ function applyDropdownsAndFormatting(sheet) {
  */
 function formatSheetHeaders(sheet, headers, bgColor) {
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  
+
   const headerRange = sheet.getRange(1, 1, 1, headers.length);
   headerRange.setBackground(bgColor);
   headerRange.setFontColor("#ffffff");
@@ -1155,6 +1208,7 @@ function formatSheetHeaders(sheet, headers, bgColor) {
  * Helper to build JSON responses for Google Apps Script Web App
  */
 function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(
+    ContentService.MimeType.JSON,
+  );
 }

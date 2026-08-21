@@ -24,7 +24,6 @@ export default function NotFound() {
       />
 
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-32 relative">
-
         {/* Ghost watermark */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden select-none pointer-events-none">
           <span
@@ -37,7 +36,6 @@ export default function NotFound() {
         </div>
 
         <div className="relative z-10 max-w-2xl mx-auto text-center">
-
           {/* Badge */}
           <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-8">
             ERROR 404
@@ -49,7 +47,8 @@ export default function NotFound() {
             style={{
               fontSize: "clamp(5rem, 18vw, 13rem)",
               letterSpacing: "0.04em",
-              textShadow: "0 0 60px rgba(56,189,248,0.35), 0 0 120px rgba(56,189,248,0.15)",
+              textShadow:
+                "0 0 60px rgba(56,189,248,0.35), 0 0 120px rgba(56,189,248,0.15)",
             }}
           >
             404

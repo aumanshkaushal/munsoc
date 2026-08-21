@@ -6,7 +6,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Youth Parliament (YPM) Registration",
-  description: "Youth Parliament (YPM) Registration & Payment Portal by MUNSoC NITJ.",
+  description:
+    "Youth Parliament (YPM) Registration & Payment Portal by MUNSoC NITJ.",
 };
 
 export default function YpmPage() {
@@ -46,7 +47,8 @@ export default function YpmPage() {
             National Parliamentary Simulation
           </p>
           <p className="text-white/60 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto text-pretty">
-            Simulating Indian parliamentary debates and policy negotiations under the patronage of Model United Nations Society, NIT Jalandhar.
+            Simulating Indian parliamentary debates and policy negotiations
+            under the patronage of Model United Nations Society, NIT Jalandhar.
           </p>
         </Reveal>
       </section>

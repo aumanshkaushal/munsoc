@@ -148,7 +148,7 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
       w: number,
       h: number,
       r: number,
-      fillColor: string
+      fillColor: string,
     ) => {
       ctx.fillStyle = fillColor;
       ctx.beginPath();
@@ -164,14 +164,7 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
       const cornerRadius = cellSize * 2.2;
 
       // Outer Box (Dark slate / black)
-      drawRoundedRect(
-        x,
-        y,
-        outerSize,
-        outerSize,
-        cornerRadius,
-        "#0f172a"
-      );
+      drawRoundedRect(x, y, outerSize, outerSize, cornerRadius, "#0f172a");
 
       // White inner cutout
       const whitePadding = cellSize * 1.05;
@@ -181,7 +174,7 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
         outerSize - whitePadding * 2,
         outerSize - whitePadding * 2,
         cornerRadius * 0.75,
-        "#ffffff"
+        "#ffffff",
       );
 
       // Inner Solid Pill / Dot (#38bdf8 sky blue brand tint)
@@ -192,7 +185,7 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
         outerSize - dotPadding * 2,
         outerSize - dotPadding * 2,
         cornerRadius * 0.5,
-        "#0284c7"
+        "#0284c7",
       );
     };
 
@@ -211,10 +204,26 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
           const y = r * cellSize;
 
           // Liquid connectivity check: are adjacent top/bottom/left/right neighbors filled?
-          const top = r > 0 && modules.get(r - 1, c) && !isFinderPattern(r - 1, c) && !isCenterLogoArea(r - 1, c);
-          const bottom = r < moduleCount - 1 && modules.get(r + 1, c) && !isFinderPattern(r + 1, c) && !isCenterLogoArea(r + 1, c);
-          const left = c > 0 && modules.get(r, c - 1) && !isFinderPattern(r, c - 1) && !isCenterLogoArea(r, c - 1);
-          const right = c < moduleCount - 1 && modules.get(r, c + 1) && !isFinderPattern(r, c + 1) && !isCenterLogoArea(r, c + 1);
+          const top =
+            r > 0 &&
+            modules.get(r - 1, c) &&
+            !isFinderPattern(r - 1, c) &&
+            !isCenterLogoArea(r - 1, c);
+          const bottom =
+            r < moduleCount - 1 &&
+            modules.get(r + 1, c) &&
+            !isFinderPattern(r + 1, c) &&
+            !isCenterLogoArea(r + 1, c);
+          const left =
+            c > 0 &&
+            modules.get(r, c - 1) &&
+            !isFinderPattern(r, c - 1) &&
+            !isCenterLogoArea(r, c - 1);
+          const right =
+            c < moduleCount - 1 &&
+            modules.get(r, c + 1) &&
+            !isFinderPattern(r, c + 1) &&
+            !isCenterLogoArea(r, c + 1);
 
           // Liquid border radius: round isolated edges, square connected edges
           const rSize = cellSize * 0.45;
@@ -249,30 +258,17 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
       logoW + cellSize * 0.6,
       logoH + cellSize * 0.6,
       cellSize * 1.5,
-      "#ffffff"
+      "#ffffff",
     );
 
     // Inner dark container
-    drawRoundedRect(
-      logoX,
-      logoY,
-      logoW,
-      logoH,
-      cellSize * 1.2,
-      "#090d16"
-    );
+    drawRoundedRect(logoX, logoY, logoW, logoH, cellSize * 1.2, "#090d16");
 
     // Border stroke on logo box
     ctx.strokeStyle = "#38bdf8";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(
-      logoX,
-      logoY,
-      logoW,
-      logoH,
-      cellSize * 1.2
-    );
+    ctx.roundRect(logoX, logoY, logoW, logoH, cellSize * 1.2);
     ctx.stroke();
 
     // Draw MUNSoC Brand / Icon
@@ -330,7 +326,7 @@ function CustomDropdown({
   }, []);
 
   const filteredOptions = options.filter((opt) =>
-    opt.toLowerCase().includes(search.toLowerCase())
+    opt.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -374,7 +370,8 @@ function CustomDropdown({
                 const isSelectedElsewhere = selectedOtherValues.includes(opt);
                 const isAllotted = allottedList.includes(opt);
                 const isCurrent = value === opt;
-                const isUnavailable = (isSelectedElsewhere || isAllotted) && !isCurrent;
+                const isUnavailable =
+                  (isSelectedElsewhere || isAllotted) && !isCurrent;
 
                 return (
                   <li key={opt}>
@@ -390,8 +387,8 @@ function CustomDropdown({
                         isCurrent
                           ? "bg-[#38bdf8]/15 text-[#38bdf8] font-semibold"
                           : isUnavailable
-                          ? "text-white/20 cursor-not-allowed opacity-40"
-                          : "text-white/80 hover:bg-white/5 hover:text-white cursor-pointer"
+                            ? "text-white/20 cursor-not-allowed opacity-40"
+                            : "text-white/80 hover:bg-white/5 hover:text-white cursor-pointer"
                       }`}
                     >
                       <span className="truncate pr-2">{opt}</span>
@@ -457,7 +454,9 @@ export default function YpmClient() {
     }
   }, [formData.experience]);
 
-  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleScreenshotUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -467,7 +466,10 @@ export default function YpmClient() {
       reader.onloadend = async () => {
         const base64String = reader.result?.toString().split(",")[1];
         if (!base64String) {
-          showCustomAlert("Upload Failed", "Could not read receipt image data.");
+          showCustomAlert(
+            "Upload Failed",
+            "Could not read receipt image data.",
+          );
           setUploadingImage(false);
           return;
         }
@@ -485,11 +487,17 @@ export default function YpmClient() {
           if (res.ok && data.success && data.refId) {
             setFormData((prev) => ({ ...prev, transactionId: data.refId }));
           } else {
-            showCustomAlert("Upload Failed", data.error || "Upload rejected by server.");
+            showCustomAlert(
+              "Upload Failed",
+              data.error || "Upload rejected by server.",
+            );
           }
         } catch (uploadErr) {
           console.error("Upload error:", uploadErr);
-          showCustomAlert("Upload Error", "Network error while uploading payment receipt.");
+          showCustomAlert(
+            "Upload Error",
+            "Network error while uploading payment receipt.",
+          );
         } finally {
           setUploadingImage(false);
         }
@@ -529,7 +537,7 @@ export default function YpmClient() {
     title: string,
     message: string,
     onConfirm: () => void,
-    onCancel?: () => void
+    onCancel?: () => void,
   ) => {
     setCustomDialog({
       isOpen: true,
@@ -549,8 +557,8 @@ export default function YpmClient() {
         const list = Array.isArray(data.allottedPortfolios)
           ? data.allottedPortfolios
           : Array.isArray(data.allotted)
-          ? data.allotted
-          : [];
+            ? data.allotted
+            : [];
         setAllottedPortfolios(list);
         if (data.rateLimited) {
           setIsRateLimitedClient(true);
@@ -566,7 +574,7 @@ export default function YpmClient() {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -591,7 +599,7 @@ export default function YpmClient() {
     ) {
       showCustomAlert(
         "Incomplete Application",
-        "Please fill in all personal details, all 3 portfolio preferences, and past MUN/Parliamentary experience before proceeding to payment."
+        "Please fill in all personal details, all 3 portfolio preferences, and past MUN/Parliamentary experience before proceeding to payment.",
       );
       return;
     }
@@ -600,7 +608,7 @@ export default function YpmClient() {
     if (!emailRegex.test(formData.email)) {
       showCustomAlert(
         "Invalid Email Format",
-        "Please enter a valid, reachable email address to receive conference communications."
+        "Please enter a valid, reachable email address to receive conference communications.",
       );
       return;
     }
@@ -627,7 +635,7 @@ export default function YpmClient() {
           transactionId: "",
         });
         setIsPaymentVerified(false);
-      }
+      },
     );
   };
 
@@ -637,7 +645,7 @@ export default function YpmClient() {
     if (!isPaymentVerified) {
       showCustomAlert(
         "Payment Required",
-        "Please complete and verify your registration fee payment to submit your application."
+        "Please complete and verify your registration fee payment to submit your application.",
       );
       return;
     }
@@ -669,14 +677,15 @@ export default function YpmClient() {
       } else {
         showCustomAlert(
           "Submission Issue",
-          data.error || "Failed to submit application. Please check your connection or contact the secretariat."
+          data.error ||
+            "Failed to submit application. Please check your connection or contact the secretariat.",
         );
       }
     } catch (err) {
       console.error(err);
       showCustomAlert(
         "Network Error",
-        "Failed to submit application. Please verify your internet connection and try again."
+        "Failed to submit application. Please verify your internet connection and try again.",
       );
     } finally {
       setSubmitting(false);
@@ -684,13 +693,9 @@ export default function YpmClient() {
   };
 
   const sanitizedRemark = `YPM-${(formData.name || "Delegate").replace(/[^a-zA-Z0-9]/g, "").slice(0, 15)}`;
-  const dynamicPaymentUri = `upi://pay?pa=manroopprsnl@oksbi&pn=Manroop&aid=uGICAgKCj2K7eIw&am=300&cu=INR&tn=${sanitizedRemark}`;
+  const dynamicPaymentUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=Manroop&aid=uGICAgKCj2K7eIw&am=300&cu=INR&tn=${sanitizedRemark}`;
 
-  const currentActiveStep = isPaymentVerified
-    ? 3
-    : isPaymentModalOpen
-    ? 2
-    : 1;
+  const currentActiveStep = isPaymentVerified ? 3 : isPaymentModalOpen ? 2 : 1;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
@@ -705,8 +710,8 @@ export default function YpmClient() {
                 currentActiveStep === 1
                   ? "0%"
                   : currentActiveStep === 2
-                  ? "50%"
-                  : "100%",
+                    ? "50%"
+                    : "100%",
             }}
           />
 
@@ -728,8 +733,8 @@ export default function YpmClient() {
                     isDone
                       ? "bg-[#38bdf8] text-[#0a0a0a] shadow-lg shadow-[#38bdf8]/25"
                       : isCurrent
-                      ? "bg-[#1c1c1e] text-[#38bdf8] border-2 border-[#38bdf8] shadow-md shadow-[#38bdf8]/10"
-                      : "bg-[#1c1c1e] text-white/40 border border-white/10"
+                        ? "bg-[#1c1c1e] text-[#38bdf8] border-2 border-[#38bdf8] shadow-md shadow-[#38bdf8]/10"
+                        : "bg-[#1c1c1e] text-white/40 border border-white/10"
                   }`}
                 >
                   {isDone ? <Check size={14} strokeWidth={3} /> : item.step}
@@ -764,7 +769,11 @@ export default function YpmClient() {
                 Youth Parliament (YPM)
               </h3>
               <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-4">
-                The Youth Parliament (YPM) is a parliamentary assembly designed to simulate the robust legislative discourse, policy debates, and bills of the Indian Parliament. Delegates represent Members of Parliament from diverse political ideologies, analyzing policy reforms and working toward national consensus.
+                The Youth Parliament (YPM) is a parliamentary assembly designed
+                to simulate the robust legislative discourse, policy debates,
+                and bills of the Indian Parliament. Delegates represent Members
+                of Parliament from diverse political ideologies, analyzing
+                policy reforms and working toward national consensus.
               </p>
               <div className="inline-flex items-center gap-2 text-xs font-heading font-medium tracking-wider text-[#38bdf8]">
                 <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
@@ -831,8 +840,6 @@ export default function YpmClient() {
                   <span className="text-white text-sm font-semibold">₹300</span>
                 </div>
               </div>
-
-
             </div>
           </div>
         </Reveal>
@@ -866,7 +873,8 @@ export default function YpmClient() {
                 Submission Limit Reached
               </h3>
               <p className="text-white/60 text-xs sm:text-sm leading-relaxed mb-4">
-                You have reached the submission rate limit. Please wait a while before trying again.
+                You have reached the submission rate limit. Please wait a while
+                before trying again.
               </p>
             </motion.div>
           ) : submitted ? (
@@ -889,7 +897,10 @@ export default function YpmClient() {
                 <span className="text-[#38bdf8] font-bold">
                   {formData.name}
                 </span>
-                . Your application for the Youth Parliament has been successfully received. Our secretariat team will verify your payment, review portfolio preferences, and send your confirmation email.
+                . Your application for the Youth Parliament has been
+                successfully received. Our secretariat team will verify your
+                payment, review portfolio preferences, and send your
+                confirmation email.
               </p>
               <div className="bg-[#0a0a0a]/50 p-4 rounded-xl text-left border border-white/5 text-xs text-white/60 font-mono space-y-1">
                 <div>
@@ -1093,7 +1104,8 @@ export default function YpmClient() {
                             </h4>
                           </div>
                           <p className="text-white/50 text-xs mt-1">
-                            Payment must be completed to unlock application submission.
+                            Payment must be completed to unlock application
+                            submission.
                           </p>
                         </div>
                         <button
@@ -1132,7 +1144,9 @@ export default function YpmClient() {
                             disabled={submitting}
                             className="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-400 text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-3 rounded-lg transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
                           >
-                            {submitting ? "SUBMITTING..." : "CONFIRM & SUBMIT APPLICATION"}
+                            {submitting
+                              ? "SUBMITTING..."
+                              : "CONFIRM & SUBMIT APPLICATION"}
                           </button>
                         </div>
                       </div>
@@ -1190,7 +1204,8 @@ export default function YpmClient() {
                     className="flex flex-col items-center text-center gap-4"
                   >
                     <p className="text-white/60 text-xs">
-                      Scan using Google Pay, PhonePe, Paytm, or any UPI app to pay ₹300.
+                      Scan using Google Pay, PhonePe, Paytm, or any UPI app to
+                      pay ₹300.
                     </p>
 
                     {/* QR Code */}
@@ -1201,11 +1216,15 @@ export default function YpmClient() {
                     <div className="w-full bg-[#121212] border border-white/5 rounded-xl p-3 text-xs space-y-1">
                       <div className="flex justify-between text-white/50">
                         <span>UPI ID:</span>
-                        <span className="font-mono text-white select-all">{UPI_ID}</span>
+                        <span className="font-mono text-white select-all">
+                          {UPI_ID}
+                        </span>
                       </div>
                       <div className="flex justify-between text-white/50">
                         <span>Amount:</span>
-                        <span className="font-semibold text-[#38bdf8]">₹300.00</span>
+                        <span className="font-semibold text-[#38bdf8]">
+                          ₹300.00
+                        </span>
                       </div>
                     </div>
 
@@ -1236,7 +1255,8 @@ export default function YpmClient() {
                     className="flex flex-col gap-4"
                   >
                     <p className="text-white/60 text-xs">
-                      Enter the 12-digit UPI reference ID / UTR or upload the payment receipt screenshot.
+                      Enter the 12-digit UPI reference ID / UTR or upload the
+                      payment receipt screenshot.
                     </p>
 
                     <div className="space-y-1.5">
@@ -1303,7 +1323,9 @@ export default function YpmClient() {
                       </button>
                       <button
                         type="button"
-                        disabled={!formData.transactionId.trim() || verifyingPayment}
+                        disabled={
+                          !formData.transactionId.trim() || verifyingPayment
+                        }
                         onClick={async () => {
                           setVerifyingPayment(true);
                           try {
@@ -1359,7 +1381,10 @@ export default function YpmClient() {
                 UPI Reference Number
               </h4>
               <p className="text-white/50 text-[10px] leading-relaxed mb-4">
-                Open your UPI payment transaction receipt. Find the 12-digit numeric reference ID labeled as <strong>UPI transaction ID</strong> or <strong>Ref No.</strong> as highlighted below:
+                Open your UPI payment transaction receipt. Find the 12-digit
+                numeric reference ID labeled as{" "}
+                <strong>UPI transaction ID</strong> or <strong>Ref No.</strong>{" "}
+                as highlighted below:
               </p>
 
               <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black flex items-center justify-center max-h-[420px] overflow-y-auto">

@@ -4,14 +4,20 @@ import { uploadRefMap } from "../shared";
 const GOOGLE_SHEET_WEBHOOK_URL = process.env.GOOGLE_SHEET_WEBHOOK_URL || "";
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "";
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY || "";
-const DEFAULT_PORTFOLIO_LIMIT = parseInt(process.env.PORTFOLIO_LIMIT || "65", 10);
+const DEFAULT_PORTFOLIO_LIMIT = parseInt(
+  process.env.PORTFOLIO_LIMIT || "65",
+  10,
+);
 
 const rateLimitStore = new Map<string, number[]>();
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
 const MAX_SUBMISSIONS = 3;
 
 // Stores past submission bodies per IP for rate limit alert
-const rateLimitSubmissionLog = new Map<string, { timestamp: string; body: Record<string, string> }[]>();
+const rateLimitSubmissionLog = new Map<
+  string,
+  { timestamp: string; body: Record<string, string> }[]
+>();
 
 let lastCleanup = Date.now();
 const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
@@ -27,7 +33,9 @@ function cleanupStores() {
     }
   }
   for (const [ip, log] of rateLimitSubmissionLog.entries()) {
-    const active = log.filter((s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW);
+    const active = log.filter(
+      (s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW,
+    );
     if (active.length === 0) {
       rateLimitSubmissionLog.delete(ip);
     } else if (active.length !== log.length) {
@@ -46,7 +54,9 @@ function isRateLimited(ip: string): boolean {
   }
 
   const timestamps = rateLimitStore.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW);
+  const activeTimestamps = timestamps.filter(
+    (t) => now - t < RATE_LIMIT_WINDOW,
+  );
   if (activeTimestamps.length === 0) {
     rateLimitStore.delete(ip);
   } else {
@@ -56,7 +66,9 @@ function isRateLimited(ip: string): boolean {
   // Dynamic cleanup for current IP's submission log if expired
   const log = rateLimitSubmissionLog.get(ip);
   if (log) {
-    const activeLog = log.filter((s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW);
+    const activeLog = log.filter(
+      (s) => now - Date.parse(s.timestamp) < RATE_LIMIT_WINDOW,
+    );
     if (activeLog.length === 0) {
       rateLimitSubmissionLog.delete(ip);
     } else if (activeLog.length !== log.length) {
@@ -98,13 +110,13 @@ const SAFE_HEADERS = new Set([
   "sec-fetch-site",
   "user-agent",
   "x-forwarded-for",
-  "x-real-ip"
+  "x-real-ip",
 ]);
 
 async function sendRateLimitAlert(
   ip: string,
   headers: Record<string, string>,
-  currentBody: Record<string, string>
+  currentBody: Record<string, string>,
 ) {
   if (!GOOGLE_SHEET_WEBHOOK_URL) return;
   try {
@@ -126,7 +138,9 @@ async function sendRateLimitAlert(
     }).catch((err) => {
       console.error("[MUNSoC Register] Rate limit alert webhook failed:", err);
     });
-    console.log(`[MUNSoC Register] Rate limit alert dispatched to Google Apps Script for IP: ${ip}`);
+    console.log(
+      `[MUNSoC Register] Rate limit alert dispatched to Google Apps Script for IP: ${ip}`,
+    );
   } catch (err) {
     console.error("[MUNSoC Register] Failed to send rate limit alert:", err);
   }
@@ -134,7 +148,10 @@ async function sendRateLimitAlert(
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "127.0.0.1";
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
 
     if (isRateLimited(ip)) {
       // Collect request headers (using allowlist & redaction)
@@ -151,7 +168,9 @@ export async function POST(req: NextRequest) {
       // Parse body to include in the alert (best-effort, size-capped to prevent DoS)
       let blockedBody: Record<string, string> = {};
       const contentLengthHeader = req.headers.get("content-length");
-      const contentLength = contentLengthHeader ? parseInt(contentLengthHeader, 10) : 0;
+      const contentLength = contentLengthHeader
+        ? parseInt(contentLengthHeader, 10)
+        : 0;
 
       if (contentLength > 0 && contentLength < 10240) {
         try {
@@ -167,8 +186,11 @@ export async function POST(req: NextRequest) {
       await sendRateLimitAlert(ip, headerMap, blockedBody);
 
       return NextResponse.json(
-        { success: false, error: "Rate limit exceeded. Maximum 3 submissions per hour allowed." },
-        { status: 429 }
+        {
+          success: false,
+          error: "Rate limit exceeded. Maximum 3 submissions per hour allowed.",
+        },
+        { status: 429 },
       );
     }
 
@@ -177,7 +199,7 @@ export async function POST(req: NextRequest) {
     if (rawBody.length > 10240) {
       return NextResponse.json(
         { success: false, error: "Payload too large." },
-        { status: 413 }
+        { status: 413 },
       );
     }
 
@@ -187,12 +209,27 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json(
         { success: false, error: "Invalid JSON payload." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    const { name, email, whatsapp, institute, pref1, pref2, pref3, experience, committee: committeeRaw, transactionId: transactionIdRaw } = body;
-    const transactionId = typeof transactionIdRaw === "string" ? transactionIdRaw.trim() : "";
-    const committee = typeof committeeRaw === "string" && committeeRaw.trim() ? committeeRaw.trim() : "Youth Parliament (YPM)";
+    const {
+      name,
+      email,
+      whatsapp,
+      institute,
+      pref1,
+      pref2,
+      pref3,
+      experience,
+      committee: committeeRaw,
+      transactionId: transactionIdRaw,
+    } = body;
+    const transactionId =
+      typeof transactionIdRaw === "string" ? transactionIdRaw.trim() : "";
+    const committee =
+      typeof committeeRaw === "string" && committeeRaw.trim()
+        ? committeeRaw.trim()
+        : "Youth Parliament (YPM)";
 
     recordSubmission(ip, {
       name: String(name ?? ""),
@@ -215,7 +252,7 @@ export async function POST(req: NextRequest) {
             method: "GET",
             cache: "no-store",
             signal: AbortSignal.timeout(10000),
-          }
+          },
         );
 
         const checkText = await checkResponse.text();
@@ -226,33 +263,51 @@ export async function POST(req: NextRequest) {
           checkResult = {};
         }
 
-        const portfolioLimit = checkResult.portfolioLimit || DEFAULT_PORTFOLIO_LIMIT;
+        const portfolioLimit =
+          checkResult.portfolioLimit || DEFAULT_PORTFOLIO_LIMIT;
         const allottedList = Array.isArray(checkResult.allotted)
           ? checkResult.allotted
           : Array.isArray(checkResult.allottedPortfolios)
-          ? checkResult.allottedPortfolios
-          : [];
+            ? checkResult.allottedPortfolios
+            : [];
         const allottedCount = allottedList.length;
 
         if (
           checkResult.isClosed === true ||
           checkResult.closed === true ||
-          (checkResult.result === "success" && portfolioLimit > 0 && allottedCount >= portfolioLimit)
+          (checkResult.result === "success" &&
+            portfolioLimit > 0 &&
+            allottedCount >= portfolioLimit)
         ) {
           return NextResponse.json(
-            { success: false, error: "Registrations are closed because all delegate portfolios have been allotted." },
-            { status: 403 }
+            {
+              success: false,
+              error:
+                "Registrations are closed because all delegate portfolios have been allotted.",
+            },
+            { status: 403 },
           );
         }
       } catch (checkErr) {
-        console.error("[MUNSoC Register] Failed to check registration closure status:", checkErr);
+        console.error(
+          "[MUNSoC Register] Failed to check registration closure status:",
+          checkErr,
+        );
       }
     }
 
-    if (!name || !email || !whatsapp || !pref1 || !pref2 || !pref3 || !transactionId) {
+    if (
+      !name ||
+      !email ||
+      !whatsapp ||
+      !pref1 ||
+      !pref2 ||
+      !pref3 ||
+      !transactionId
+    ) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -261,8 +316,12 @@ export async function POST(req: NextRequest) {
       const base64Image = uploadRefMap.get(transactionId);
       if (!base64Image) {
         return NextResponse.json(
-          { success: false, error: "Upload session expired. Please re-upload your payment receipt." },
-          { status: 400 }
+          {
+            success: false,
+            error:
+              "Upload session expired. Please re-upload your payment receipt.",
+          },
+          { status: 400 },
         );
       }
       uploadRefMap.delete(transactionId);
@@ -272,33 +331,48 @@ export async function POST(req: NextRequest) {
           const bodyParams = new URLSearchParams();
           bodyParams.append("image", base64Image);
 
-          const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
+          const response = await fetch(
+            `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: bodyParams,
+              signal: AbortSignal.timeout(15000),
             },
-            body: bodyParams,
-            signal: AbortSignal.timeout(15000),
-          });
+          );
 
           const uploadResult = await response.json();
-          if (uploadResult.success && uploadResult.data && uploadResult.data.url) {
+          if (
+            uploadResult.success &&
+            uploadResult.data &&
+            uploadResult.data.url
+          ) {
             resolvedTransactionId = uploadResult.data.url;
           } else {
-            console.error("[MUNSoC Register] Late upload ImgBB API error:", uploadResult);
+            console.error(
+              "[MUNSoC Register] Late upload ImgBB API error:",
+              uploadResult,
+            );
           }
         } catch (uploadError) {
-          console.error("[MUNSoC Register] Late upload to ImgBB failed:", uploadError);
+          console.error(
+            "[MUNSoC Register] Late upload to ImgBB failed:",
+            uploadError,
+          );
         }
       }
     }
 
     if (!GOOGLE_SHEET_WEBHOOK_URL) {
-      console.warn("[MUNSoC Register] Warning: GOOGLE_SHEET_WEBHOOK_URL is not set.");
-      recordSubmission(ip, {});
+      console.warn(
+        "[MUNSoC Register] Warning: GOOGLE_SHEET_WEBHOOK_URL is not set.",
+      );
       return NextResponse.json({
         success: true,
-        message: "Demo mode: Registration received. (Please set GOOGLE_SHEET_WEBHOOK_URL in .env.local for Sheets sync)",
+        message:
+          "Demo mode: Registration received. (Please set GOOGLE_SHEET_WEBHOOK_URL in .env.local for Sheets sync)",
       });
     }
 
@@ -331,7 +405,10 @@ export async function POST(req: NextRequest) {
     try {
       result = JSON.parse(responseText);
     } catch {
-      console.warn("[MUNSoC Register] Non-JSON response from Google Sheet Webhook:", responseText.slice(0, 300));
+      console.warn(
+        "[MUNSoC Register] Non-JSON response from Google Sheet Webhook:",
+        responseText.slice(0, 300),
+      );
       if (responseText.toLowerCase().includes("success") || response.ok) {
         result = { result: "success" };
       } else {
@@ -357,25 +434,39 @@ export async function POST(req: NextRequest) {
         message: result.message || "Registration recorded successfully",
       });
     } else {
-      console.error("[MUNSoC Register] Google script error:", result.error || result);
+      console.error(
+        "[MUNSoC Register] Google script error:",
+        result.error || result,
+      );
       return NextResponse.json(
-        { success: false, error: result.error || "Failed to write to Google Sheet" },
-        { status: 500 }
+        {
+          success: false,
+          error: result.error || "Failed to write to Google Sheet",
+        },
+        { status: 500 },
       );
     }
   } catch (err) {
     console.error("[MUNSoC Register] Error:", err);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "127.0.0.1";
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0] ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
     const rateLimited = isRateLimited(ip);
 
     if (!GOOGLE_SHEET_WEBHOOK_URL) {
-      console.warn("[MUNSoC Register] Warning: GOOGLE_SHEET_WEBHOOK_URL is not set.");
+      console.warn(
+        "[MUNSoC Register] Warning: GOOGLE_SHEET_WEBHOOK_URL is not set.",
+      );
       return NextResponse.json({
         success: true,
         allotted: [],
@@ -393,7 +484,7 @@ export async function GET(req: NextRequest) {
         method: "GET",
         cache: "no-store",
         signal: AbortSignal.timeout(10000),
-      }
+      },
     );
 
     const responseText = await response.text();
@@ -401,16 +492,22 @@ export async function GET(req: NextRequest) {
     try {
       result = JSON.parse(responseText);
     } catch {
-      console.warn("[MUNSoC Register] Non-JSON GET response from Google Sheet Webhook:", responseText.slice(0, 200));
-      result = { result: "error", error: "Invalid JSON returned by sheet script" };
+      console.warn(
+        "[MUNSoC Register] Non-JSON GET response from Google Sheet Webhook:",
+        responseText.slice(0, 200),
+      );
+      result = {
+        result: "error",
+        error: "Invalid JSON returned by sheet script",
+      };
     }
 
     if (result.result === "success" || result.status === "success") {
       const allottedList = Array.isArray(result.allotted)
         ? result.allotted
         : Array.isArray(result.allottedPortfolios)
-        ? result.allottedPortfolios
-        : [];
+          ? result.allottedPortfolios
+          : [];
 
       return NextResponse.json({
         success: true,
@@ -430,18 +527,20 @@ export async function GET(req: NextRequest) {
           allottedPortfolios: [],
           rateLimited,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (err) {
     console.error("[MUNSoC Register] GET Error:", err);
-    return NextResponse.json({
-      success: false,
-      error: "Server error",
-      allotted: [],
-      allottedPortfolios: [],
-      rateLimited: false,
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Server error",
+        allotted: [],
+        allottedPortfolios: [],
+        rateLimited: false,
+      },
+      { status: 500 },
+    );
   }
 }
-

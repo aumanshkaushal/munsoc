@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
-  matcher: "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)).*)",
+  matcher:
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)).*)",
 };
 
 export async function proxy(req: NextRequest) {
@@ -13,7 +14,9 @@ export async function proxy(req: NextRequest) {
     const webhookSecret = process.env.WEBHOOK_SECRET || "";
 
     if (!webhookUrl) {
-      console.warn("[MUNSoC Proxy] REF_TRACKING_WEBHOOK_URL is not set, skipping tracking.");
+      console.warn(
+        "[MUNSoC Proxy] REF_TRACKING_WEBHOOK_URL is not set, skipping tracking.",
+      );
       return NextResponse.next();
     }
 
@@ -52,4 +55,3 @@ export async function proxy(req: NextRequest) {
 
   return NextResponse.next();
 }
-

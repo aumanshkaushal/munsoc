@@ -109,7 +109,9 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={
-        shouldReduce ? { hidden: { opacity: 0 }, show: { opacity: 1 } } : itemVariants
+        shouldReduce
+          ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
+          : itemVariants
       }
     >
       {children}

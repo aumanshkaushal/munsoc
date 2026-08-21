@@ -39,17 +39,25 @@ export async function POST(req: NextRequest) {
     }
 
     if (result.result === "success" || result.status === "success") {
-      return NextResponse.json({ success: true, message: result.message || "Tracking recorded" });
+      return NextResponse.json({
+        success: true,
+        message: result.message || "Tracking recorded",
+      });
     } else {
-      console.error("[MUNSoC Track] Google script error:", result.error || result);
+      console.error(
+        "[MUNSoC Track] Google script error:",
+        result.error || result,
+      );
       return NextResponse.json(
         { success: false, error: result.error || "Failed to write to sheet" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (err) {
     console.error("[MUNSoC Track] Error:", err);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Server error" },
+      { status: 500 },
+    );
   }
 }
-

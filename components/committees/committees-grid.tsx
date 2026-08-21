@@ -57,10 +57,9 @@ export default function CommitteesGrid() {
               {/* Title & Core Description */}
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                  <h2
-                    className="font-display text-white text-3xl sm:text-4xl md:text-5xl tracking-wide"
-                  >
-                    YOUTH PARLIAMENT <span className="text-[#38bdf8]">(YPM)</span>
+                  <h2 className="font-display text-white text-3xl sm:text-4xl md:text-5xl tracking-wide">
+                    YOUTH PARLIAMENT{" "}
+                    <span className="text-[#38bdf8]">(YPM)</span>
                   </h2>
                   <span className="inline-flex items-center gap-1.5 self-start sm:self-auto text-[#38bdf8] text-xs font-heading font-semibold tracking-widest px-3 py-1 rounded-full bg-[#38bdf8]/10 border border-[#38bdf8]/25">
                     <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
@@ -69,7 +68,12 @@ export default function CommitteesGrid() {
                 </div>
 
                 <p className="text-white/70 text-sm sm:text-base leading-relaxed max-w-4xl text-pretty">
-                  A high-octane parliamentary simulation designed to emulate the proceedings of the Indian legislative assemblies. Delegates take on the mantle of Members of Parliament and political leaders to debate policy reforms, present bills, scrutinize national policy, and negotiate consensus on critical socio-economic and governance matters.
+                  A high-octane parliamentary simulation designed to emulate the
+                  proceedings of the Indian legislative assemblies. Delegates
+                  take on the mantle of Members of Parliament and political
+                  leaders to debate policy reforms, present bills, scrutinize
+                  national policy, and negotiate consensus on critical
+                  socio-economic and governance matters.
                 </p>
               </div>
 
@@ -83,7 +87,8 @@ export default function CommitteesGrid() {
                     </h4>
                   </div>
                   <p className="text-white/55 text-xs leading-relaxed">
-                    Question Hour, Zero Hour, Calling Attention Motions &amp; legislative debates.
+                    Question Hour, Zero Hour, Calling Attention Motions &amp;
+                    legislative debates.
                   </p>
                 </div>
 
@@ -95,7 +100,8 @@ export default function CommitteesGrid() {
                     </h4>
                   </div>
                   <p className="text-white/55 text-xs leading-relaxed">
-                    Under active review &bull; Comprehensive background guide revealing soon.
+                    Under active review &bull; Comprehensive background guide
+                    revealing soon.
                   </p>
                 </div>
 
@@ -107,7 +113,8 @@ export default function CommitteesGrid() {
                     </h4>
                   </div>
                   <p className="text-white/55 text-xs leading-relaxed">
-                    Open to all college students &amp; aspiring diplomats across India.
+                    Open to all college students &amp; aspiring diplomats across
+                    India.
                   </p>
                 </div>
               </div>
@@ -116,7 +123,9 @@ export default function CommitteesGrid() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
                 <div className="flex items-center gap-2 text-white/50 text-xs font-heading">
                   <span>Official Secretariat:</span>
-                  <span className="text-[#38bdf8] font-semibold">MUNSoC NIT Jalandhar</span>
+                  <span className="text-[#38bdf8] font-semibold">
+                    MUNSoC NIT Jalandhar
+                  </span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
@@ -152,13 +161,13 @@ export default function CommitteesGrid() {
         {/* Informational Callout */}
         <Reveal className="bg-[#1a3d5c]/30 border border-[#38bdf8]/20 rounded-2xl p-8 md:p-10 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-[#38bdf8]/5 blur-[60px] rounded-full" />
-          <h3
-            className="font-display text-white text-2xl mb-3 tracking-wide"
-          >
+          <h3 className="font-display text-white text-2xl mb-3 tracking-wide">
             STAY TUNED FOR UPDATES
           </h3>
           <p className="text-white/70 text-sm leading-relaxed max-w-xl mx-auto mb-6 text-pretty">
-            Detailed agenda matrices, background guides, and committee schedules will be published prior to the conference. Follow our official channels for live announcements.
+            Detailed agenda matrices, background guides, and committee schedules
+            will be published prior to the conference. Follow our official
+            channels for live announcements.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
