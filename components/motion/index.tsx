@@ -8,7 +8,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "motion/react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -29,14 +29,25 @@ export function Reveal({
   duration = 0.7,
   once = true,
 }: RevealProps) {
-  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const shouldReduce = mounted && Boolean(reduceMotion);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <motion.div
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
+      initial={{ opacity: 0, y: shouldReduce ? 0 : y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: "-80px" }}
-      transition={{ duration, delay, ease: EASE }}
+      transition={{
+        duration: shouldReduce ? 0.01 : duration,
+        delay: shouldReduce ? 0 : delay,
+        ease: EASE,
+      }}
     >
       {children}
     </motion.div>
@@ -86,12 +97,21 @@ export function StaggerItem({
   children: ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const shouldReduce = mounted && Boolean(reduceMotion);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <motion.div
       className={className}
       variants={
-        reduce ? { hidden: { opacity: 0 }, show: { opacity: 1 } } : itemVariants
+        shouldReduce
+          ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
+          : itemVariants
       }
     >
       {children}
@@ -110,16 +130,22 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
-  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const shouldReduce = mounted && Boolean(reduceMotion);
   const motionValue = useMotionValue(0);
   const spring = useSpring(motionValue, { duration: 1600, bounce: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (inView) motionValue.set(value);
   }, [inView, value, motionValue]);
 
   useEffect(() => {
-    if (reduce) {
+    if (shouldReduce) {
       if (ref.current) ref.current.textContent = `${value}${suffix}`;
       return;
     }
@@ -128,7 +154,7 @@ export function CountUp({
         ref.current.textContent = `${Math.round(latest)}${suffix}`;
       }
     });
-  }, [spring, suffix, reduce, value]);
+  }, [spring, suffix, shouldReduce, value]);
 
   return <span ref={ref} className={className}>{`0${suffix}`}</span>;
 }
@@ -140,11 +166,18 @@ export function HoverCard({
   children: ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const shouldReduce = mounted && Boolean(reduceMotion);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <motion.div
       className={className}
-      whileHover={reduce ? undefined : { y: -6 }}
+      whileHover={shouldReduce ? undefined : { y: -6 }}
       transition={{ duration: 0.35, ease: EASE }}
     >
       {children}

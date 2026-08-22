@@ -81,7 +81,9 @@ export default function ContactPage() {
             CONNECT WITH MUNSOC
           </h1>
           <p className="mt-4 text-white/70 text-sm leading-relaxed max-w-xl mx-auto text-pretty">
-            Have questions regarding registrations, committees, portfolios, or partnerships? Reach out to us, and we will get back to you as soon as possible.
+            Have questions regarding registrations, committees, portfolios, or
+            partnerships? Reach out to us, and we will get back to you as soon
+            as possible.
           </p>
         </Reveal>
       </section>
@@ -89,14 +91,20 @@ export default function ContactPage() {
       {/* Contact Details Cards Section */}
       <section className="py-16 px-4 max-w-4xl mx-auto bg-[#121212]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
           {/* Email Card */}
-          <Reveal delay={0.05} className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300">
+          <Reveal
+            delay={0.05}
+            className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300"
+          >
             <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-xl flex items-center justify-center mb-4 text-[#38bdf8]">
               <Mail size={20} strokeWidth={1.5} />
             </div>
-            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">Email Us</h3>
-            <p className="text-white/50 text-xs mb-4">For official inquiries and support</p>
+            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">
+              Email Us
+            </h3>
+            <p className="text-white/50 text-xs mb-4">
+              For official inquiries and support
+            </p>
             <a
               href="mailto:nitjmunsoc@gmail.com"
               className="text-[#38bdf8] hover:text-[#7dd3fc] font-heading font-bold text-sm tracking-wide transition-colors"
@@ -106,24 +114,38 @@ export default function ContactPage() {
           </Reveal>
 
           {/* Location Card */}
-          <Reveal delay={0.1} className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300">
+          <Reveal
+            delay={0.1}
+            className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300"
+          >
             <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-xl flex items-center justify-center mb-4 text-[#38bdf8]">
               <MapPin size={20} strokeWidth={1.5} />
             </div>
-            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">Our Location</h3>
+            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">
+              Our Location
+            </h3>
             <p className="text-white/50 text-xs mb-4">Visit us on campus</p>
             <p className="text-white/70 text-xs leading-relaxed">
-              Student Activity Cabin,<br />
-              Student Activity Centre (SAC),<br />
+              Student Activity Cabin,
+              <br />
+              Student Activity Centre (SAC),
+              <br />
               NIT Jalandhar, Punjab - 144008
             </p>
           </Reveal>
 
           {/* Social Channels Card */}
-          <Reveal delay={0.15} className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300 md:col-span-2">
-            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-2">Connect Digitally</h3>
-            <p className="text-white/50 text-xs mb-6">Stay updated with instant announcements via our social networks.</p>
-            
+          <Reveal
+            delay={0.15}
+            className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300 md:col-span-2"
+          >
+            <h3 className="font-heading font-bold text-white text-base tracking-wide mb-2">
+              Connect Digitally
+            </h3>
+            <p className="text-white/50 text-xs mb-6">
+              Stay updated with instant announcements via our social networks.
+            </p>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <a
                 href="https://instagram.com/nitjmunsociety"
@@ -135,8 +157,12 @@ export default function ContactPage() {
                   <InstagramIcon size={18} />
                 </span>
                 <div>
-                  <span className="text-white text-xs font-semibold block">Instagram</span>
-                  <span className="text-white/40 text-[10px]">@nitjmunsociety</span>
+                  <span className="text-white text-xs font-semibold block">
+                    Instagram
+                  </span>
+                  <span className="text-white/40 text-[10px]">
+                    @nitjmunsociety
+                  </span>
                 </div>
               </a>
 
@@ -150,7 +176,9 @@ export default function ContactPage() {
                   <LinkedinIcon size={18} />
                 </span>
                 <div>
-                  <span className="text-white text-xs font-semibold block">LinkedIn</span>
+                  <span className="text-white text-xs font-semibold block">
+                    LinkedIn
+                  </span>
                   <span className="text-white/40 text-[10px]">MUNSoC NITJ</span>
                 </div>
               </a>
@@ -165,30 +193,41 @@ export default function ContactPage() {
                   <MessageCircle size={18} strokeWidth={1.5} />
                 </span>
                 <div>
-                  <span className="text-white text-xs font-semibold block">WhatsApp</span>
-                  <span className="text-white/40 text-[10px]">Community Link</span>
+                  <span className="text-white text-xs font-semibold block">
+                    WhatsApp
+                  </span>
+                  <span className="text-white/40 text-[10px]">
+                    Community Link
+                  </span>
                 </div>
               </a>
             </div>
           </Reveal>
 
           {/* Working Hours / Response time Card */}
-          <Reveal delay={0.2} className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300 md:col-span-2">
+          <Reveal
+            delay={0.2}
+            className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300 md:col-span-2"
+          >
             <div className="flex gap-4 items-start">
               <div className="w-8 h-8 bg-[#38bdf8]/10 rounded-lg flex items-center justify-center text-[#38bdf8] shrink-0">
                 <Clock size={16} strokeWidth={1.5} />
               </div>
               <div>
-                <h4 className="font-heading font-bold text-white text-sm tracking-wide mb-1">Response Time</h4>
+                <h4 className="font-heading font-bold text-white text-sm tracking-wide mb-1">
+                  Response Time
+                </h4>
                 <p className="text-white/60 text-xs leading-relaxed">
-                  We typical respond to all official emails within 24 to 48 hours. For urgent queries regarding registration or guidelines, we recommend reaching out to us through our Instagram handles or asking in the WhatsApp community.
-                  </p>
-                </div>
+                  We typical respond to all official emails within 24 to 48
+                  hours. For urgent queries regarding registration or
+                  guidelines, we recommend reaching out to us through our
+                  Instagram handles or asking in the WhatsApp community.
+                </p>
               </div>
-            </Reveal>
-
-          </div>
-        </section>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       <Footer />
     </main>

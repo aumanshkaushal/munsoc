@@ -104,7 +104,6 @@ export default function PrivacyPolicyPage() {
 
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
-          
           <Reveal>
             <p className="text-white/70 text-sm leading-relaxed mb-14 text-pretty border-l-2 border-[#38bdf8]/40 pl-5">
               This Privacy Policy describes how MUNSoC NITJ (&ldquo;we&rdquo;,

@@ -20,7 +20,6 @@ export default function OrganizingCommittee() {
   return (
     <section className="bg-[#0d0d0d] py-20 px-4">
       <div className="max-w-5xl mx-auto">
-        
         <Reveal className="text-center mb-12">
           <h2
             className="font-display text-white"

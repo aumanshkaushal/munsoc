@@ -30,7 +30,6 @@ export default function MissionSection() {
   return (
     <section className="bg-[#121212] py-24 px-4">
       <div className="max-w-5xl mx-auto">
-        
         <Reveal className="text-center mb-16">
           <h2
             className="font-display text-white tracking-wide"
@@ -48,7 +47,6 @@ export default function MissionSection() {
         </Reveal>
 
         <Stagger className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
           <StaggerItem
             className={`${cardBase} p-8 flex flex-col justify-between min-h-56 group`}
           >

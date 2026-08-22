@@ -1,25 +1,31 @@
 "use client";
 
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
 const stackedLines = [
-  "WE ARE BACK",
-  "WE ARE BACK",
-  "WE ARE BACK",
-  "WE ARE BACK",
-  "WE ARE BACK",
-  "WE ARE BACK",
-  "WE ARE BACK",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
+  "YOUTH PARLIAMENT",
 ];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function HeroSection() {
-  const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const reduce = mounted && Boolean(reduceMotion);
   const middle = Math.floor(stackedLines.length / 2);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-[#0a0a0a]">
@@ -42,15 +48,17 @@ export default function HeroSection() {
               className={`leading-[0.92] w-full text-center font-display whitespace-nowrap ${
                 reduce ? "" : "animate-hero-fade-in-up"
               }`}
-              style={{
-                fontSize: "clamp(2.8rem, 11vw, 8.5rem)",
-                color: isMiddle ? "#38bdf8" : "#ffffff",
-                letterSpacing: "0.05em",
-                opacity: finalOpacity,
-                animationDelay: reduce ? undefined : `${0.06 * dist}s`,
-                animationFillMode: reduce ? undefined : "both",
-                ["--target-opacity" as any]: finalOpacity,
-              } as React.CSSProperties}
+              style={
+                {
+                  fontSize: "clamp(2.8rem, 11vw, 8.5rem)",
+                  color: isMiddle ? "#38bdf8" : "#ffffff",
+                  letterSpacing: "0.05em",
+                  opacity: finalOpacity,
+                  animationDelay: reduce ? undefined : `${0.06 * dist}s`,
+                  animationFillMode: reduce ? undefined : "both",
+                  ["--target-opacity" as any]: finalOpacity,
+                } as React.CSSProperties
+              }
               aria-hidden={!isMiddle}
             >
               {line}
@@ -62,19 +70,22 @@ export default function HeroSection() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto pb-28 pt-10">
-        <div
-          className={`inline-flex items-center gap-2 border border-[#38bdf8]/40 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1.5 rounded-sm mb-6 ${
+        <Link
+          href="/committees/ypm"
+          className={`inline-flex items-center gap-2 border border-[#38bdf8]/35 bg-[#38bdf8]/5 text-[#38bdf8] hover:border-[#38bdf8]/60 hover:bg-[#38bdf8]/10 text-[10px] font-heading tracking-[0.2em] px-4 py-1.5 rounded-full mb-6 transition-all duration-300 hover:scale-105 shadow-md shadow-[#38bdf8]/5 ${
             reduce ? "" : "animate-hero-fade-in-up"
           }`}
-          style={{
-            animationDelay: reduce ? undefined : "0.5s",
-            animationFillMode: reduce ? undefined : "both",
-            ["--target-opacity" as any]: 1,
-          } as React.CSSProperties}
+          style={
+            {
+              animationDelay: reduce ? undefined : "0.5s",
+              animationFillMode: reduce ? undefined : "both",
+              ["--target-opacity" as any]: 1,
+            } as React.CSSProperties
+          }
         >
-          <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-pulse" />
-          THE WAIT IS OVER &nbsp;&middot;&nbsp; WE ARE BACK
-        </div>
+          <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
+          YOUTH PARLIAMENT: 10 OCT (TENTATIVE) &rarr;
+        </Link>
 
         <h1
           className="font-display text-white leading-[0.95] text-balance"
@@ -89,11 +100,13 @@ export default function HeroSection() {
               className={`inline-block mr-[0.22em] ${
                 reduce ? "" : "animate-hero-fade-in-up"
               }`}
-              style={{
-                animationDelay: reduce ? undefined : `${0.55 + i * 0.08}s`,
-                animationFillMode: reduce ? undefined : "both",
-                ["--target-opacity" as any]: 1,
-              } as React.CSSProperties}
+              style={
+                {
+                  animationDelay: reduce ? undefined : `${0.55 + i * 0.08}s`,
+                  animationFillMode: reduce ? undefined : "both",
+                  ["--target-opacity" as any]: 1,
+                } as React.CSSProperties
+              }
             >
               {word}
             </span>
@@ -102,11 +115,13 @@ export default function HeroSection() {
             className={`inline-block text-[#38bdf8] mr-[0.22em] ${
               reduce ? "" : "animate-hero-fade-in-up"
             }`}
-            style={{
-              animationDelay: reduce ? undefined : "0.71s",
-              animationFillMode: reduce ? undefined : "both",
-              ["--target-opacity" as any]: 1,
-            } as React.CSSProperties}
+            style={
+              {
+                animationDelay: reduce ? undefined : "0.71s",
+                animationFillMode: reduce ? undefined : "both",
+                ["--target-opacity" as any]: 1,
+              } as React.CSSProperties
+            }
           >
             DIPLOMATS
           </span>
@@ -115,11 +130,13 @@ export default function HeroSection() {
             className={`inline-block ${
               reduce ? "" : "animate-hero-fade-in-up"
             }`}
-            style={{
-              animationDelay: reduce ? undefined : "0.8s",
-              animationFillMode: reduce ? undefined : "both",
-              ["--target-opacity" as any]: 1,
-            } as React.CSSProperties}
+            style={
+              {
+                animationDelay: reduce ? undefined : "0.8s",
+                animationFillMode: reduce ? undefined : "both",
+                ["--target-opacity" as any]: 1,
+              } as React.CSSProperties
+            }
           >
             OF TOMORROW
           </span>
@@ -129,11 +146,13 @@ export default function HeroSection() {
           className={`mt-6 text-white/70 text-sm sm:text-base leading-relaxed max-w-xl text-pretty ${
             reduce ? "" : "animate-hero-fade-in-up"
           }`}
-          style={{
-            animationDelay: reduce ? undefined : "0.95s",
-            animationFillMode: reduce ? undefined : "both",
-            ["--target-opacity" as any]: 1,
-          } as React.CSSProperties}
+          style={
+            {
+              animationDelay: reduce ? undefined : "0.95s",
+              animationFillMode: reduce ? undefined : "both",
+              ["--target-opacity" as any]: 1,
+            } as React.CSSProperties
+          }
         >
           Join a legacy of rigorous debate, international diplomacy, and student
           leadership at Dr. B.R. Ambedkar National Institute of Technology
@@ -144,11 +163,13 @@ export default function HeroSection() {
           className={`flex flex-wrap gap-4 mt-8 justify-center ${
             reduce ? "" : "animate-hero-fade-in-up"
           }`}
-          style={{
-            animationDelay: reduce ? undefined : "1.05s",
-            animationFillMode: reduce ? undefined : "both",
-            ["--target-opacity" as any]: 1,
-          } as React.CSSProperties}
+          style={
+            {
+              animationDelay: reduce ? undefined : "1.05s",
+              animationFillMode: reduce ? undefined : "both",
+              ["--target-opacity" as any]: 1,
+            } as React.CSSProperties
+          }
         >
           <motion.div
             whileHover={{ scale: 1.04 }}
@@ -156,11 +177,11 @@ export default function HeroSection() {
             transition={{ duration: 0.2 }}
           >
             <Link
-              href="/join"
+              href="/committees/ypm"
               className="bg-[#38bdf8] text-[#0a0a0a] font-display text-sm tracking-widest px-7 py-3 rounded-lg hover:bg-[#7dd3fc] transition-colors inline-block shadow-lg shadow-[#38bdf8]/25"
               style={{ letterSpacing: "0.1em" }}
             >
-              APPLY TO MUNSOC
+              PARTICIPATE NOW
             </Link>
           </motion.div>
           <motion.div

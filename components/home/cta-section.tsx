@@ -25,9 +25,9 @@ export default function CTASection() {
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-4 text-white/70 text-sm leading-relaxed text-pretty max-w-md mx-auto">
-            Whether you&apos;re a seasoned delegate or looking to attend your
-            first conference, MUNSoC NITJ provides the platform to elevate your
-            voice.
+            Whether you&apos;re a seasoned delegate or stepping into parliament
+            for the first time, MUNSoC NITJ provides the platform to elevate
+            your voice.
           </p>
         </Reveal>
         <Reveal delay={0.2}>
@@ -38,10 +38,10 @@ export default function CTASection() {
             className="mt-8 inline-block"
           >
             <Link
-              href="/join"
+              href="/committees/ypm"
               className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-semibold text-sm tracking-widest px-8 py-3 rounded hover:bg-[#7dd3fc] transition-colors inline-block shadow-lg shadow-[#38bdf8]/20"
             >
-              APPLY TO JOIN MUNSOC TODAY
+              PARTICIPATE NOW
             </Link>
           </motion.div>
         </Reveal>

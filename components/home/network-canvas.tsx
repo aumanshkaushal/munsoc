@@ -52,7 +52,9 @@ export default function NetworkCanvas() {
     let currentGlowY = 0;
     let pulseTime = 0;
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const motionScale = prefersReducedMotion ? 0 : 1;
 
     function resize() {
@@ -114,7 +116,7 @@ export default function NetworkCanvas() {
         0,
         currentGlowX,
         currentGlowY,
-        glowRadius
+        glowRadius,
       );
       bgGrad.addColorStop(0, `${GLOW_COLOR}${maxBgAlpha})`);
       bgGrad.addColorStop(0.5, `${GLOW_COLOR}${maxBgAlpha * 0.35})`);
@@ -126,8 +128,8 @@ export default function NetworkCanvas() {
       autoRy += 0.0014 * motionScale;
 
       if (isHovered && motionScale > 0) {
-        const targetRx = -(mouseY - cy) / cy * 0.35;
-        const targetRy = (mouseX - cx) / cx * 0.35;
+        const targetRx = (-(mouseY - cy) / cy) * 0.35;
+        const targetRy = ((mouseX - cx) / cx) * 0.35;
         tiltRx += (targetRx - tiltRx) * 0.06;
         tiltRy += (targetRy - tiltRy) * 0.06;
       } else {
@@ -191,7 +193,8 @@ export default function NetworkCanvas() {
 
           if (dist3D < MAX_DIST_3D) {
             const avgZ = (nodes[i].pz + nodes[j].pz) / 2;
-            let alpha = (1 - dist3D / MAX_DIST_3D) * 0.18 * ((avgZ + 1.2) / 2.2);
+            let alpha =
+              (1 - dist3D / MAX_DIST_3D) * 0.18 * ((avgZ + 1.2) / 2.2);
 
             const avgGlow = (nodes[i].glow + nodes[j].glow) / 2;
             if (avgGlow > 0) {
@@ -227,7 +230,7 @@ export default function NetworkCanvas() {
           0,
           n.screenX,
           n.screenY,
-          renderRadius * 4.5
+          renderRadius * 4.5,
         );
         grad.addColorStop(0, `${GLOW_COLOR}${glowAlpha})`);
         grad.addColorStop(1, "rgba(56, 189, 248, 0)");
@@ -269,7 +272,7 @@ export default function NetworkCanvas() {
           }
         });
       },
-      { threshold: 0.05 }
+      { threshold: 0.05 },
     );
     observer.observe(parent);
 
