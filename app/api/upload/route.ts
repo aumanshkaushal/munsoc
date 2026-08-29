@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    if (image.length > 2_000_000) {
+    if (image.length > 15_000_000) {
       return NextResponse.json(
-        { success: false, error: "Image data too large" },
+        { success: false, error: "Image data too large (max 10MB)" },
         { status: 413 },
       );
     }

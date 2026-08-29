@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const REF_TRACKING_WEBHOOK_URL = process.env.REF_TRACKING_WEBHOOK_URL || "";
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "";
+const REF_TRACKING_WEBHOOK_URL =
+  process.env.YPM_REF_TRACKING_WEBHOOK_URL ||
+  process.env.REF_TRACKING_WEBHOOK_URL ||
+  "";
+const WEBHOOK_SECRET =
+  process.env.YPM_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET || "";
 
 export async function POST(req: NextRequest) {
   try {
