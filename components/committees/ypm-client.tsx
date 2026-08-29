@@ -271,16 +271,19 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
     ctx.roundRect(logoX, logoY, logoW, logoH, cellSize * 1.2);
     ctx.stroke();
 
-    // Draw MUNSoC Brand / Icon
-    ctx.fillStyle = "#38bdf8";
-    ctx.font = `bold ${Math.floor(cellSize * 2.1)}px system-ui, -apple-system, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("MUN", size / 2, size / 2 - cellSize * 0.7);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${Math.floor(cellSize * 1.4)}px system-ui, -apple-system, sans-serif`;
-    ctx.fillText("NITJ", size / 2, size / 2 + cellSize * 1.0);
+    // Draw MUNSoC Brand Logo SVG
+    const img = new window.Image();
+    img.src = "/munsoc-white-blue.svg";
+    img.onload = () => {
+      const pad = cellSize * 0.7;
+      ctx.drawImage(
+        img,
+        logoX + pad,
+        logoY + pad,
+        logoW - pad * 2,
+        logoH - pad * 2,
+      );
+    };
   }, [value, size]);
 
   return (
@@ -639,18 +642,18 @@ export default function YpmClient() {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isPaymentVerified) {
+  const executeSubmit = async (overrideTxnId?: string) => {
+    const activeTxnId = overrideTxnId || formData.transactionId;
+    if (!activeTxnId || !activeTxnId.trim()) {
       showCustomAlert(
-        "Payment Required",
-        "Please complete and verify your registration fee payment to submit your application.",
+        "Transaction ID Required",
+        "Please enter your UPI Transaction ID or upload a receipt screenshot.",
       );
       return;
     }
 
     setSubmitting(true);
+    setIsPaymentVerified(true);
 
     try {
       const res = await fetch("/api/register", {
@@ -660,6 +663,7 @@ export default function YpmClient() {
         },
         body: JSON.stringify({
           ...formData,
+          transactionId: activeTxnId,
           committee: "Youth Parliament (YPM)",
         }),
       });
@@ -673,6 +677,7 @@ export default function YpmClient() {
       }
 
       if (res.ok && data.success) {
+        setIsPaymentModalOpen(false);
         setSubmitted(true);
       } else {
         showCustomAlert(
@@ -692,6 +697,11 @@ export default function YpmClient() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await executeSubmit();
+  };
+
   const sanitizedRemark = `YPM-${(formData.name || "Delegate").replace(/[^a-zA-Z0-9]/g, "").slice(0, 15)}`;
   const dynamicPaymentUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=Manroop&aid=uGICAgKCj2K7eIw&am=300&cu=INR&tn=${sanitizedRemark}`;
 
@@ -699,12 +709,34 @@ export default function YpmClient() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
+      {/* Fullscreen Blur Loading Overlay during Submission */}
+      <AnimatePresence>
+        {submitting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-6 text-center select-none"
+          >
+            <div className="bg-[#1c1c1e] border border-[#38bdf8]/30 rounded-2xl p-8 max-w-sm w-full flex flex-col items-center shadow-2xl shadow-[#38bdf8]/10">
+              <div className="w-12 h-12 border-4 border-[#38bdf8]/20 border-t-[#38bdf8] rounded-full animate-spin mb-4" />
+              <h4 className="font-heading font-bold text-white text-sm tracking-widest uppercase">
+                Submitting Application
+              </h4>
+              <p className="text-white/60 text-xs mt-2 leading-relaxed">
+                Please wait a moment while we process your application and notify the Secretariat...
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Visual Stepper */}
       <div className="mb-14">
         <div className="flex items-center justify-between max-w-md mx-auto relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] w-full bg-white/10 -z-0" />
+          <div className="absolute left-0 top-4 -translate-y-1/2 h-[2px] w-full bg-white/10 -z-0" />
           <div
-            className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#38bdf8] transition-all duration-500 -z-0"
+            className="absolute left-0 top-4 -translate-y-1/2 h-[2px] bg-[#38bdf8] transition-all duration-500 -z-0"
             style={{
               width:
                 currentActiveStep === 1
@@ -823,7 +855,7 @@ export default function YpmClient() {
                     Mode &amp; Venue
                   </span>
                   <span className="text-white text-sm font-semibold">
-                    TBA &bull; NIT Jalandhar
+                    Offline &bull; NIT Jalandhar
                   </span>
                 </div>
               </div>
@@ -938,6 +970,27 @@ export default function YpmClient() {
                   JOIN MUNSOC WHATSAPP COMMUNITY
                 </a>
               </div>
+            </motion.div>
+          ) : allottedPortfolios.length >= memberList.length ? (
+            <motion.div
+              key="registrations-closed"
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-xl mx-auto bg-[#1c1c1e] border border-[#38bdf8]/20 rounded-2xl p-8 text-center shadow-lg shadow-[#38bdf8]/5 mt-6"
+            >
+              <div className="w-16 h-16 bg-[#38bdf8]/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#38bdf8]">
+                <Lock size={30} />
+              </div>
+              <h3 className="font-heading font-bold text-white text-xl mb-3 uppercase tracking-wide">
+                Registrations Closed
+              </h3>
+              <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
+                Thank you for your interest! All delegate portfolios for the
+                Youth Parliament (YPM) have been allotted, and registrations are
+                now officially closed.
+              </p>
             </motion.div>
           ) : (
             <motion.div
@@ -1275,6 +1328,7 @@ export default function YpmClient() {
                       </div>
                       <input
                         type="text"
+                        name="transactionId"
                         value={formData.transactionId}
                         onChange={(e) =>
                           setFormData((prev) => ({
@@ -1283,35 +1337,89 @@ export default function YpmClient() {
                           }))
                         }
                         placeholder="e.g. 421589123456"
-                        className="w-full bg-[#121212] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#38bdf8] font-mono"
+                        disabled={formData.transactionId.startsWith("MUNSOC-REF-")}
+                        className="w-full bg-[#121212] border border-[#38bdf8]/35 focus:border-[#38bdf8] rounded-lg px-4 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none transition-all font-mono disabled:opacity-45 disabled:cursor-not-allowed"
+                        required
                       />
                     </div>
 
-                    <div className="relative flex py-1 items-center">
-                      <div className="flex-grow border-t border-white/10" />
-                      <span className="flex-shrink mx-3 text-white/40 text-[10px] uppercase font-heading tracking-widest">
-                        OR UPLOAD RECEIPT
+                    {/* Backup Upload Section */}
+                    <div className="pt-3.5 border-t border-white/5 mt-1.5">
+                      <span className="text-[9px] font-heading font-bold text-white/40 uppercase tracking-widest block mb-2 leading-relaxed">
+                        Still can't find it? Upload the screenshot instead:
                       </span>
-                      <div className="flex-grow border-t border-white/10" />
+                      <label
+                        className={`w-full bg-[#121212] border border-dashed rounded-lg px-4 py-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                          uploadingImage
+                            ? "opacity-50 cursor-not-allowed border-white/5"
+                            : "border-white/10 hover:border-[#38bdf8]/40 hover:bg-[#38bdf8]/5"
+                        }`}
+                      >
+                        {uploadingImage ? (
+                          <div className="flex items-center gap-1.5 text-[11px] text-white/50 font-medium">
+                            <svg
+                              className="animate-spin h-3.5 w-3.5 text-[#38bdf8]"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              />
+                            </svg>
+                            <span>Uploading receipt...</span>
+                          </div>
+                        ) : formData.transactionId &&
+                          formData.transactionId.startsWith("MUNSOC-REF-") ? (
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-1.5 text-[11px] text-[#38bdf8] font-bold uppercase tracking-wider font-heading">
+                              <Check size={14} />
+                              <span>Screenshot Loaded</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  transactionId: "",
+                                }));
+                              }}
+                              className="text-white/40 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                              title="Remove Screenshot"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center select-none">
+                            <span className="text-[10px] text-white/40 block font-medium">
+                              Click to select receipt image
+                            </span>
+                            <span className="text-[8px] text-white/20 font-mono mt-0.5 block">
+                              JPG, PNG or WEBP
+                            </span>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingImage}
+                          onChange={handleScreenshotUpload}
+                          className="hidden"
+                        />
+                      </label>
                     </div>
-
-                    <label className="border-2 border-dashed border-white/10 hover:border-[#38bdf8]/40 rounded-xl p-4 text-center cursor-pointer transition-colors block bg-[#121212]">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleScreenshotUpload}
-                        className="hidden"
-                        disabled={uploadingImage}
-                      />
-                      <span className="text-xs text-white/60 block font-heading">
-                        {uploadingImage
-                          ? "Uploading Receipt..."
-                          : "Upload Payment Screenshot"}
-                      </span>
-                      <span className="text-[10px] text-white/30 block mt-0.5">
-                        PNG, JPG, or WebP
-                      </span>
-                    </label>
 
                     <div className="flex gap-2 pt-3">
                       <button
@@ -1323,25 +1431,15 @@ export default function YpmClient() {
                       </button>
                       <button
                         type="button"
-                        disabled={
-                          !formData.transactionId.trim() || verifyingPayment
-                        }
+                        disabled={!formData.transactionId.trim() || submitting}
                         onClick={async () => {
-                          setVerifyingPayment(true);
-                          try {
-                            await new Promise((r) => setTimeout(r, 600));
-                            await refreshAllottedPortfolios();
-                            setIsPaymentVerified(true);
-                            setIsPaymentModalOpen(false);
-                          } catch (err) {
-                            console.error("Verification error:", err);
-                          } finally {
-                            setVerifyingPayment(false);
-                          }
+                          await executeSubmit();
                         }}
                         className="flex-[2] bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest py-2.5 rounded-lg hover:bg-[#7dd3fc] transition-all shadow-md shadow-[#38bdf8]/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        {verifyingPayment ? "VERIFYING..." : "CONFIRM & UNLOCK"}
+                        {submitting
+                          ? "SUBMITTING..."
+                          : "CONFIRM & SUBMIT APPLICATION"}
                       </button>
                     </div>
                   </motion.div>

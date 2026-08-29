@@ -1,8 +1,70 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Reveal } from "@/components/motion";
-import { Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 import type { Metadata } from "next";
+
+const MailIcon = ({ size = 20 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
+const MapPinIcon = ({ size = 20 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const MessageCircleIcon = ({ size = 18 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+  </svg>
+);
+
+const ClockIcon = ({ size = 16 }: { size?: number }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
 
 const InstagramIcon = ({ size = 18 }: { size?: number }) => (
   <svg
@@ -97,7 +159,7 @@ export default function ContactPage() {
             className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300"
           >
             <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-xl flex items-center justify-center mb-4 text-[#38bdf8]">
-              <Mail size={20} strokeWidth={1.5} />
+              <MailIcon size={20} />
             </div>
             <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">
               Email Us
@@ -119,7 +181,7 @@ export default function ContactPage() {
             className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 hover:border-[#38bdf8]/30 transition-all duration-300"
           >
             <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-xl flex items-center justify-center mb-4 text-[#38bdf8]">
-              <MapPin size={20} strokeWidth={1.5} />
+              <MapPinIcon size={20} />
             </div>
             <h3 className="font-heading font-bold text-white text-base tracking-wide mb-1">
               Our Location
@@ -190,7 +252,7 @@ export default function ContactPage() {
                 className="flex items-center gap-3 bg-[#0a0a0a]/40 border border-white/5 rounded-xl p-3.5 hover:bg-[#38bdf8]/5 hover:border-[#38bdf8]/20 transition-all duration-300"
               >
                 <span className="text-[#38bdf8]">
-                  <MessageCircle size={18} strokeWidth={1.5} />
+                  <MessageCircleIcon size={18} />
                 </span>
                 <div>
                   <span className="text-white text-xs font-semibold block">
@@ -211,7 +273,7 @@ export default function ContactPage() {
           >
             <div className="flex gap-4 items-start">
               <div className="w-8 h-8 bg-[#38bdf8]/10 rounded-lg flex items-center justify-center text-[#38bdf8] shrink-0">
-                <Clock size={16} strokeWidth={1.5} />
+                <ClockIcon size={16} />
               </div>
               <div>
                 <h4 className="font-heading font-bold text-white text-sm tracking-wide mb-1">
