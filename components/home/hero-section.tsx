@@ -40,9 +40,8 @@ export default function HeroSection() {
       {/* Massive Poster Text */}
       <div className="relative z-0 flex flex-col items-center w-full select-none pointer-events-none mt-8 pb-0">
         <div 
-          className={`w-full text-center whitespace-nowrap flex items-center justify-center text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          className={`font-poster w-full text-center whitespace-nowrap flex items-center justify-center text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
-            fontFamily: 'Haettenschweiler, Impact, sans-serif',
             fontSize: "clamp(6rem, 24vw, 17rem)",
             lineHeight: '0.8',
             transform: 'scaleY(1.35)',
@@ -55,9 +54,8 @@ export default function HeroSection() {
         </div>
         
         <div 
-          className={`w-full text-center whitespace-nowrap text-white/40 mt-8 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          className={`font-poster w-full text-center whitespace-nowrap text-white/40 mt-8 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
-            fontFamily: 'Haettenschweiler, Impact, sans-serif',
             fontSize: "clamp(4rem, 16vw, 10rem)",
             lineHeight: '0.8',
             transform: 'scaleY(1.6)',

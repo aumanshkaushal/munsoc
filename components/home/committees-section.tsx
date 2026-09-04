@@ -74,9 +74,9 @@ export default function CommitteesSection() {
                       {c.code}
                     </span>
                   </div>
-                  <h3 
-                    className="text-white text-2xl mb-2 pr-12 tracking-wide transition-colors group-hover:text-[#38bdf8]"
-                    style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+                  <h3
+                    className="font-poster text-white text-2xl mb-2 pr-12 tracking-wide leading-[0.95] transition-colors group-hover:text-[#38bdf8]"
+                    style={{ letterSpacing: "0.05em" }}
                   >
                     {c.name}
                   </h3>

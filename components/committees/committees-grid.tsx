@@ -54,9 +54,8 @@ export default function CommitteesGrid() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                   <h2
-                    className="text-white text-4xl sm:text-5xl md:text-6xl tracking-wide"
+                    className="font-poster text-white text-4xl sm:text-5xl md:text-6xl tracking-wide leading-[0.95]"
                     style={{
-                      fontFamily: "Haettenschweiler, Impact, sans-serif",
                       letterSpacing: "0.05em",
                     }}
                   >
