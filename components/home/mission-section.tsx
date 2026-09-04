@@ -1,9 +1,8 @@
 "use client";
 
-import { Globe, Mic, FileText, Plane, ArrowRight } from "lucide-react";
+import { Globe, Mic, FileText, Plane, ArrowRight, Users } from "lucide-react";
 import Link from "next/link";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion";
-import NetworkCanvas from "./network-canvas";
 
 const skills = [
   {
@@ -96,17 +95,18 @@ export default function MissionSection() {
           </StaggerItem>
 
           <StaggerItem
-            className={`${cardBase} overflow-hidden relative min-h-52 group p-0`}
+            className={`${cardBase} p-8 flex flex-col justify-between min-h-52 group`}
           >
-            <NetworkCanvas />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/30 to-transparent pointer-events-none" />
-
-            <div className="absolute bottom-6 left-6 z-10 pointer-events-none">
-              <p className="font-heading font-bold text-white tracking-wide text-lg">
+            <Users
+              size={28}
+              className="text-[#38bdf8] mb-4 transition-transform duration-500 group-hover:scale-110"
+              strokeWidth={1.5}
+            />
+            <div>
+              <p className="text-[#38bdf8] text-[10px] font-heading tracking-widest mb-1">
                 A NETWORK OF LEADERS
               </p>
-              <p className="text-white/70 text-xs mt-1">
+              <p className="text-white/60 text-sm leading-relaxed">
                 Connect with driven individuals from across disciplines.
               </p>
             </div>

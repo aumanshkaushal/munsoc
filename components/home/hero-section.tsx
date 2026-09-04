@@ -5,74 +5,76 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
-const stackedLines = [
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-  "YOUTH PARLIAMENT",
-];
-
-const EASE = [0.22, 1, 0.36, 1] as const;
+const AshokaChakra = () => (
+  <svg 
+    viewBox="0 0 100 100" 
+    className="inline-block w-[0.8em] h-[0.8em] text-[#38bdf8] mx-1 animate-[spin_20s_linear_infinite]" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.5"
+  >
+    <circle cx="50" cy="50" r="44" />
+    <circle cx="50" cy="50" r="10" fill="currentColor" />
+    {Array.from({ length: 24 }).map((_, i) => (
+      <line key={i} x1="50" y1="50" x2="50" y2="6" transform={`rotate(${i * 15} 50 50)`} />
+    ))}
+  </svg>
+);
 
 export default function HeroSection() {
   const [mounted, setMounted] = useState(false);
   const reduceMotion = useReducedMotion();
   const reduce = mounted && Boolean(reduceMotion);
-  const middle = Math.floor(stackedLines.length / 2);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-[#0a0a0a]">
+    <section className="relative overflow-hidden bg-[#0a0a0a] min-h-[90vh] flex flex-col justify-center pt-20">
       <div
-        className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 h-[480px] w-[480px] rounded-full bg-[#38bdf8]/10 blur-[130px] mun-glow"
+        className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#38bdf8]/15 blur-[140px] mun-glow"
         aria-hidden
       />
 
-      <div className="relative flex flex-col items-center overflow-hidden py-4 select-none pointer-events-none">
-        {stackedLines.map((line, i) => {
-          const isMiddle = i === middle;
-          const dist = Math.abs(i - middle);
-          const finalOpacity = isMiddle
-            ? 1
-            : 0.025 + (i / stackedLines.length) * 0.11;
-
-          return (
-            <div
-              key={i}
-              className={`leading-[0.92] w-full text-center font-display whitespace-nowrap ${
-                reduce ? "" : "animate-hero-fade-in-up"
-              }`}
-              style={
-                {
-                  fontSize: "clamp(2.8rem, 11vw, 8.5rem)",
-                  color: isMiddle ? "#38bdf8" : "#ffffff",
-                  letterSpacing: "0.05em",
-                  opacity: finalOpacity,
-                  animationDelay: reduce ? undefined : `${0.06 * dist}s`,
-                  animationFillMode: reduce ? undefined : "both",
-                  ["--target-opacity" as any]: finalOpacity,
-                } as React.CSSProperties
-              }
-              aria-hidden={!isMiddle}
-            >
-              {line}
-            </div>
-          );
-        })}
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0a0a0a] to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+      {/* Massive Poster Text */}
+      <div className="relative z-0 flex flex-col items-center w-full select-none pointer-events-none mt-8 pb-0">
+        <div 
+          className={`w-full text-center whitespace-nowrap flex items-center justify-center text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          style={{
+            fontFamily: 'Haettenschweiler, Impact, sans-serif',
+            fontSize: "clamp(6rem, 24vw, 17rem)",
+            lineHeight: '0.8',
+            transform: 'scaleY(1.35)',
+            letterSpacing: '0.01em',
+            animationDelay: reduce ? undefined : "0.1s",
+            animationFillMode: reduce ? undefined : "both",
+          }}
+        >
+          Y<AshokaChakra />UTH
+        </div>
+        
+        <div 
+          className={`w-full text-center whitespace-nowrap text-white/40 mt-8 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          style={{
+            fontFamily: 'Haettenschweiler, Impact, sans-serif',
+            fontSize: "clamp(4rem, 16vw, 10rem)",
+            lineHeight: '0.8',
+            transform: 'scaleY(1.6)',
+            letterSpacing: '0.05em',
+            animationDelay: reduce ? undefined : "0.3s",
+            animationFillMode: reduce ? undefined : "both",
+          }}
+        >
+          PARLIAMENT
+        </div>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto pb-28 pt-10">
+      {/* Lower Details */}
+      <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto pb-24 pt-4 mt-2 sm:mt-8">
         <Link
           href="/committees/ypm"
-          className={`inline-flex items-center gap-2 border border-[#38bdf8]/35 bg-[#38bdf8]/5 text-[#38bdf8] hover:border-[#38bdf8]/60 hover:bg-[#38bdf8]/10 text-[10px] font-heading tracking-[0.2em] px-4 py-1.5 rounded-full mb-6 transition-all duration-300 hover:scale-105 shadow-md shadow-[#38bdf8]/5 ${
+          className={`inline-flex items-center gap-2 border border-[#38bdf8]/35 bg-[#38bdf8]/5 text-[#38bdf8] hover:border-[#38bdf8]/60 hover:bg-[#38bdf8]/10 text-[10px] font-heading tracking-[0.2em] px-4 py-1.5 rounded-full mb-12 transition-all duration-300 hover:scale-105 shadow-md shadow-[#38bdf8]/5 ${
             reduce ? "" : "animate-hero-fade-in-up"
           }`}
           style={
@@ -84,7 +86,7 @@ export default function HeroSection() {
           }
         >
           <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
-          YOUTH PARLIAMENT: 10 OCT (TENTATIVE) &rarr;
+          YOUTH PARLIAMENT: 10 OCT &rarr;
         </Link>
 
         <h1

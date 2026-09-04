@@ -9,11 +9,11 @@ const committees = [
     code: "YOUTH PARLIAMENT",
     name: "Youth Parliament (YPM)",
     organizer: "MUNSoC NITJ",
-    desc: "A dynamic parliamentary simulation where delegates take on the roles of Members of Parliament to debate, legislate, and resolve pressing national and international issues.",
+    desc: "This conference agenda focuses on modernizing India's educational ecosystem, shifting from rote learning to competency-based evaluation.",
     href: "/committees/ypm",
-    date: "10 October 2026 (Tentative)",
+    date: "10 October 2026",
     mode: "TBA",
-    agenda: "Revealing Soon",
+    agenda: "Discussions on comprehensive reforms to the Indian examination system.",
   },
 ];
 
@@ -74,7 +74,10 @@ export default function CommitteesSection() {
                       {c.code}
                     </span>
                   </div>
-                  <h3 className="font-heading font-semibold text-white text-base mb-2 pr-12 tracking-wide transition-colors group-hover:text-[#38bdf8]">
+                  <h3 
+                    className="text-white text-2xl mb-2 pr-12 tracking-wide transition-colors group-hover:text-[#38bdf8]"
+                    style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+                  >
                     {c.name}
                   </h3>
                   <p className="text-white/60 text-xs leading-relaxed mb-3">

@@ -21,7 +21,7 @@ export default function HomePage() {
                     href="/committees"
                     className="hover:text-white transition-colors uppercase"
                   >
-                    YOUTH PARLIAMENT ON 10 OCT (TENTATIVE)
+                    YOUTH PARLIAMENT ON 10 OCT
                   </a>
                 </p>
                 <div className="h-3 w-[1px] bg-[#38bdf8]/20" />
