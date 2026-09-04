@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import localFont from "next/font/local";
 import { Inter, Archivo, Geist_Mono, Anton } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +27,16 @@ const anton = Anton({
   subsets: ["latin"],
   weight: "400",
   display: "swap",
+});
+
+const haettenschweiler = localFont({
+  src: "../public/fonts/haettenschweiler.woff2",
+  variable: "--font-poster",
+  display: "block",
+  weight: "400",
+  style: "normal",
+  fallback: ["Impact", "Arial Narrow", "sans-serif"],
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
@@ -170,7 +181,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${archivo.variable} ${geistMono.variable} ${anton.variable} bg-[#121212]`}
+      className={`${inter.variable} ${archivo.variable} ${geistMono.variable} ${anton.variable} ${haettenschweiler.variable} bg-[#121212]`}
     >
       <body className="font-sans antialiased">
         {children}
