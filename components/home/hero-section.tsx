@@ -98,7 +98,7 @@ export default function HeroSection() {
           }
         >
           <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
-          YOUTH PARLIAMENT: 10 OCT &rarr;
+          YOUTH PARLIAMENT: 10 OCTOBER 2026 (TENTATIVE) &rarr;
         </Link>
 
         <h1

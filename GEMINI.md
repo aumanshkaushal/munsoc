@@ -9,17 +9,19 @@ Google Apps Script (`scripts/google-sheets-handler.js`) handles registrations vi
 ## Key Infrastructure
 
 ### Google Apps Script Webhook
-- **Webhook URL:** `https://script.google.com/macros/s/AKfycbwSX1b2ZMEC0vYqs2Otzj7B2bzkTMUm2BjDMg1L_FusAMpxQ74Pjwm6OZeRKm95PVRGrA/exec`
-- **Spreadsheet ID:** `1bBWMchqICgjqAOJAEMBdWS-65TAZBPYYXUmwNi1vb7U`
+- **Webhook URL:** Configured via `GOOGLE_SHEET_WEBHOOK_URL` in `.env.local`
+- **Spreadsheet ID:** Stored server-side in Google Apps Script Script Properties
 - **Secretariat email:** `nitjmunsoc@gmail.com`
 
 ### Apps Script Properties (secrets stored server-side, not in code)
 Both of these must be set in Apps Script → ⚙️ Project Settings → Script Properties:
 - `WEBHOOK_SECRET` — shared secret between Next.js and Apps Script
-- `SPREADSHEET_ID` — `1bBWMchqICgjqAOJAEMBdWS-65TAZBPYYXUmwNi1vb7U`
+- `SPREADSHEET_ID` — Google Sheet spreadsheet ID (from the spreadsheet URL)
 
 ### .env.local Variables
-- `GOOGLE_SHEET_WEBHOOK_URL` — the Apps Script webhook URL above
+- `GOOGLE_SHEET_WEBHOOK_URL` — the Apps Script deployed Web App `/exec` URL
+- `REF_TRACKING_WEBHOOK_URL` — referral tracking Web App `/exec` URL
+- `WEBHOOK_SECRET` — shared secret matching Apps Script property
 
 ---
 

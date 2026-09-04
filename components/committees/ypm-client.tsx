@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Trash2,
   Calendar,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import QRCode from "qrcode";
@@ -435,6 +436,7 @@ export default function YpmClient() {
   });
 
   const [allottedPortfolios, setAllottedPortfolios] = useState<string[]>([]);
+  const [isLoadingPortfolios, setIsLoadingPortfolios] = useState<boolean>(true);
   const [isRateLimitedClient, setIsRateLimitedClient] = useState(false);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
 
@@ -552,6 +554,7 @@ export default function YpmClient() {
   };
 
   const refreshAllottedPortfolios = async () => {
+    setIsLoadingPortfolios(true);
     try {
       const res = await fetch("/api/register");
       if (res.ok) {
@@ -568,6 +571,8 @@ export default function YpmClient() {
       }
     } catch (err) {
       console.error("Failed to refresh allotted portfolios:", err);
+    } finally {
+      setIsLoadingPortfolios(false);
     }
   };
 
@@ -589,6 +594,14 @@ export default function YpmClient() {
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isLoadingPortfolios) {
+      showCustomAlert(
+        "Please Wait",
+        "Live portfolio availability is still loading. Please wait a moment before proceeding.",
+      );
+      return;
+    }
+
     if (
       !formData.name ||
       !formData.email ||
@@ -602,6 +615,18 @@ export default function YpmClient() {
       showCustomAlert(
         "Incomplete Application",
         "Please fill in all personal details, all 3 portfolio preferences, and past MUN/Parliamentary experience before proceeding to payment.",
+      );
+      return;
+    }
+
+    if (
+      allottedPortfolios.includes(formData.pref1) ||
+      allottedPortfolios.includes(formData.pref2) ||
+      allottedPortfolios.includes(formData.pref3)
+    ) {
+      showCustomAlert(
+        "Portfolio Unavailable",
+        "One or more of your selected preferences has already been allotted to another delegate. Please select from the available portfolios.",
       );
       return;
     }
@@ -839,7 +864,7 @@ export default function YpmClient() {
                     Event Date
                   </span>
                   <span className="text-white text-sm font-semibold">
-                    10 October 2026
+                    10 October 2026 (Tentative)
                   </span>
                 </div>
               </div>
@@ -994,7 +1019,7 @@ export default function YpmClient() {
                 </a>
               </div>
             </motion.div>
-          ) : allottedPortfolios.length >= memberList.length ? (
+          ) : !isLoadingPortfolios && allottedPortfolios.length >= memberList.length ? (
             <motion.div
               key="registrations-closed"
               initial={{ scale: 0.95, opacity: 0, y: 15 }}
@@ -1106,53 +1131,78 @@ export default function YpmClient() {
 
                   {/* Portfolio Preferences */}
                   <div className="space-y-3 pt-2 border-t border-white/5">
-                    <h4 className="text-xs font-heading font-semibold tracking-wider text-white/80 uppercase">
-                      Portfolio Preferences (Rank 1 to 3) *
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-white/40 block">
-                          Preference 1
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-heading font-semibold tracking-wider text-white/80 uppercase">
+                        Portfolio Preferences (Rank 1 to 3) *
+                      </h4>
+                      {isLoadingPortfolios && (
+                        <span className="text-[10px] text-[#38bdf8] font-heading tracking-wider flex items-center gap-1.5 uppercase">
+                          <Loader2 size={12} className="animate-spin" />
+                          Checking availability...
                         </span>
-                        <CustomDropdown
-                          disabled={isPaymentVerified}
-                          options={memberList}
-                          value={formData.pref1}
-                          onChange={(val) => handleDropdownChange("pref1", val)}
-                          placeholder="Select Portfolio 1"
-                          selectedOtherValues={[formData.pref2, formData.pref3]}
-                          allottedList={allottedPortfolios}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-white/40 block">
-                          Preference 2
-                        </span>
-                        <CustomDropdown
-                          disabled={isPaymentVerified}
-                          options={memberList}
-                          value={formData.pref2}
-                          onChange={(val) => handleDropdownChange("pref2", val)}
-                          placeholder="Select Portfolio 2"
-                          selectedOtherValues={[formData.pref1, formData.pref3]}
-                          allottedList={allottedPortfolios}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[11px] text-white/40 block">
-                          Preference 3
-                        </span>
-                        <CustomDropdown
-                          disabled={isPaymentVerified}
-                          options={memberList}
-                          value={formData.pref3}
-                          onChange={(val) => handleDropdownChange("pref3", val)}
-                          placeholder="Select Portfolio 3"
-                          selectedOtherValues={[formData.pref1, formData.pref2]}
-                          allottedList={allottedPortfolios}
-                        />
-                      </div>
+                      )}
                     </div>
+
+                    {isLoadingPortfolios ? (
+                      <div className="bg-[#121212] border border-[#38bdf8]/20 rounded-xl p-6 flex flex-col items-center justify-center gap-3 text-center py-7">
+                        <div className="w-8 h-8 rounded-full bg-[#38bdf8]/10 flex items-center justify-center text-[#38bdf8]">
+                          <Loader2 size={18} className="animate-spin" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-heading font-semibold text-white tracking-wider uppercase">
+                            Fetching Available Portfolios...
+                          </p>
+                          <p className="text-[11px] text-white/40">
+                            Checking live allotment status from the secretariat
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <span className="text-[11px] text-white/40 block">
+                            Preference 1
+                          </span>
+                          <CustomDropdown
+                            disabled={isPaymentVerified}
+                            options={memberList}
+                            value={formData.pref1}
+                            onChange={(val) => handleDropdownChange("pref1", val)}
+                            placeholder="Select Portfolio 1"
+                            selectedOtherValues={[formData.pref2, formData.pref3]}
+                            allottedList={allottedPortfolios}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[11px] text-white/40 block">
+                            Preference 2
+                          </span>
+                          <CustomDropdown
+                            disabled={isPaymentVerified}
+                            options={memberList}
+                            value={formData.pref2}
+                            onChange={(val) => handleDropdownChange("pref2", val)}
+                            placeholder="Select Portfolio 2"
+                            selectedOtherValues={[formData.pref1, formData.pref3]}
+                            allottedList={allottedPortfolios}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[11px] text-white/40 block">
+                            Preference 3
+                          </span>
+                          <CustomDropdown
+                            disabled={isPaymentVerified}
+                            options={memberList}
+                            value={formData.pref3}
+                            onChange={(val) => handleDropdownChange("pref3", val)}
+                            placeholder="Select Portfolio 3"
+                            selectedOtherValues={[formData.pref1, formData.pref2]}
+                            allottedList={allottedPortfolios}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Past MUN Experience */}

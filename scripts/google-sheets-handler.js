@@ -200,6 +200,26 @@ function onOpen() {
   }
 }
 
+/**
+ * Trigger handler for installable spreadsheet edit events (onEditTrigger).
+ * Safe no-op / logger that prevents 'Script function not found: onEditTrigger' errors.
+ */
+function onEditTrigger(e) {
+  if (!e || !e.range) return;
+  try {
+    const sheet = e.range.getSheet();
+    if (!sheet) return;
+    Logger.log(
+      "[MUNSoC onEditTrigger] Edit on sheet: " +
+        sheet.getName() +
+        " | Range: " +
+        e.range.getA1Notation(),
+    );
+  } catch (err) {
+    Logger.log("[MUNSoC onEditTrigger] Error: " + err.toString());
+  }
+}
+
 // ==============================================================================
 // HTTP GET HANDLER
 // ==============================================================================
