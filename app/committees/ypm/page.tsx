@@ -43,8 +43,8 @@ export default function YpmPage() {
           <h1
             className="font-poster text-white whitespace-nowrap uppercase leading-[0.85]"
             style={{
-              fontSize: "clamp(2.4rem, 10.7vw, 6rem)",
-              letterSpacing: "0.01em",
+              fontSize: "clamp(3.5rem, 8vw, 6rem)",
+              letterSpacing: "0.02em",
               transform: "scaleY(1.4)",
               display: "inline-block",
             }}
