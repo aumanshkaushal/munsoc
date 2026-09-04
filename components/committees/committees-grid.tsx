@@ -79,31 +79,29 @@ export default function CommitteesGrid() {
 
               {/* Features & Committee Highlights Grid */}
               <div className="w-full pt-2">
-                <div className="bg-[#121212]/80 border border-white/8 rounded-xl p-4 flex flex-col gap-2 w-full">
-                  <div className="flex items-center gap-2 text-[#38bdf8]">
-                    <Sparkles size={18} />
-                    <h4 className="font-heading font-semibold text-xs text-white tracking-wider uppercase">
-                      Agenda &amp; Topics
-                    </h4>
+                <div className="bg-[#121212]/80 border border-white/8 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                  <div className="flex flex-col gap-2 min-w-0">
+                    <div className="flex items-center gap-2 text-[#38bdf8]">
+                      <Sparkles size={18} />
+                      <h4 className="font-heading font-semibold text-xs text-white tracking-wider uppercase">
+                        Agenda &amp; Topics
+                      </h4>
+                    </div>
+                    <p className="text-white/55 text-xs leading-relaxed">
+                      Discussions on comprehensive reforms to the Indian
+                      examination system.
+                    </p>
                   </div>
-                  <p className="text-white/55 text-xs leading-relaxed">
-                    Discussions on comprehensive reforms to the Indian
-                    examination system.
-                  </p>
-                </div>
-              </div>
 
-              {/* Card Footer & Action Bar */}
-              <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4 border-t border-white/10">
-                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
                   <motion.div
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ duration: 0.2 }}
+                    className="shrink-0"
                   >
                     <Link
                       href="/committees/ypm"
-                      className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-2.5 rounded-lg hover:bg-[#7dd3fc] transition-all shadow-lg shadow-[#38bdf8]/20 flex items-center gap-2"
+                      className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-2.5 rounded-lg hover:bg-[#7dd3fc] transition-all shadow-lg shadow-[#38bdf8]/20 flex items-center gap-2 whitespace-nowrap"
                     >
                       REGISTER / PAY NOW
                       <ArrowRight size={14} />
