@@ -797,9 +797,9 @@ export default function YpmClient() {
               <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
                 COMMITTEE OVERVIEW
               </div>
-              <h3 
-                className="text-white text-3xl sm:text-4xl mb-4 tracking-wide"
-                style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+              <h3
+                className="font-poster text-white text-3xl sm:text-4xl mb-4 tracking-wide leading-[0.95]"
+                style={{ letterSpacing: "0.05em" }}
               >
                 YOUTH PARLIAMENT (YPM)
               </h3>
@@ -890,9 +890,9 @@ export default function YpmClient() {
           <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
             REGISTRATION &amp; PAYMENT PORTAL
           </div>
-          <h2 
-            className="text-white text-4xl tracking-wide uppercase"
-            style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+          <h2
+            className="font-poster text-white text-4xl tracking-wide uppercase leading-[0.95]"
+            style={{ letterSpacing: "0.05em" }}
           >
             APPLY FOR YOUTH PARLIAMENT
           </h2>
@@ -939,7 +939,7 @@ export default function YpmClient() {
                 <span className="text-[#38bdf8] font-bold">
                   {formData.name}
                 </span>
-                . Your application for the <span style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}>YOUTH PARLIAMENT</span> has been
+                . Your application for the <span className="font-poster" style={{ letterSpacing: "0.05em" }}>YOUTH PARLIAMENT</span> has been
                 successfully received. Our secretariat team will verify your
                 payment, review portfolio preferences, and send your
                 confirmation email.
@@ -998,7 +998,7 @@ export default function YpmClient() {
               </h3>
               <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
                 Thank you for your interest! All delegate portfolios for the
-                <span style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}>YOUTH PARLIAMENT (YPM)</span> have been allotted, and registrations are
+                <span className="font-poster" style={{ letterSpacing: "0.05em" }}>YOUTH PARLIAMENT (YPM)</span> have been allotted, and registrations are
                 now officially closed.
               </p>
             </motion.div>

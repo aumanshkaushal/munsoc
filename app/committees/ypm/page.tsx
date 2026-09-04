@@ -23,13 +23,13 @@ export default function YpmPage() {
         />
         <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none overflow-hidden">
           <span
-            className="text-white/[0.025] whitespace-nowrap"
-            style={{ 
-              fontFamily: 'Haettenschweiler, Impact, sans-serif',
+            className="font-poster text-white/[0.025] whitespace-nowrap"
+            style={{
               fontSize: "clamp(6rem, 22vw, 16rem)",
               letterSpacing: "0.02em",
+              lineHeight: "0.8",
               transform: "scaleY(1.4)",
-              display: "inline-block"
+              display: "inline-block",
             }}
             aria-hidden
           >
@@ -41,13 +41,12 @@ export default function YpmPage() {
             PARLIAMENTARY COMMITTEE &bull; 10 OCTOBER 2026
           </div>
           <h1
-            className="text-white text-balance uppercase"
+            className="font-poster text-white whitespace-nowrap uppercase leading-[0.85]"
             style={{
-              fontFamily: 'Haettenschweiler, Impact, sans-serif',
-              fontSize: "clamp(3.5rem, 8vw, 6rem)",
-              letterSpacing: "0.02em",
+              fontSize: "clamp(2.4rem, 10.7vw, 6rem)",
+              letterSpacing: "0.01em",
               transform: "scaleY(1.4)",
-              display: "inline-block"
+              display: "inline-block",
             }}
           >
             YOUTH PARLIAMENT
