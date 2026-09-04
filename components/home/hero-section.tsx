@@ -6,11 +6,11 @@ import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
 const AshokaChakra = () => (
-  <svg 
-    viewBox="0 0 100 100" 
-    className="inline-block w-[0.8em] h-[0.8em] text-[#38bdf8] mx-1 animate-[spin_20s_linear_infinite]" 
-    fill="none" 
-    stroke="currentColor" 
+  <svg
+    viewBox="0 0 100 100"
+    className="inline-block w-[0.8em] h-[0.8em] text-[#38bdf8] mx-1 translate-y-[0.05em] animate-[spin_20s_linear_infinite]"
+    fill="none"
+    stroke="currentColor"
     strokeWidth="2.5"
   >
     <circle cx="50" cy="50" r="44" />
@@ -39,10 +39,10 @@ export default function HeroSection() {
 
       {/* Massive Poster Text */}
       <div className="relative z-0 flex flex-col items-center w-full select-none pointer-events-none mt-8 pb-0">
-        <div 
+        <div
           className={`font-poster w-full text-center whitespace-nowrap flex items-center justify-center text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
-            fontSize: "clamp(6rem, 24vw, 17rem)",
+            fontSize: "clamp(7rem, 24vw, 17rem)",
             lineHeight: '0.8',
             transform: 'scaleY(1.35)',
             letterSpacing: '0.01em',
@@ -52,9 +52,9 @@ export default function HeroSection() {
         >
           Y<AshokaChakra />UTH
         </div>
-        
-        <div 
-          className={`font-poster w-full text-center whitespace-nowrap text-white/40 mt-8 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
+
+        <div
+          className={`font-poster w-full text-center whitespace-nowrap text-white/40 mt-6 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
             fontSize: "clamp(4rem, 16vw, 10rem)",
             lineHeight: '0.8',

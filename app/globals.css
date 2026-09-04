@@ -2,13 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@font-face {
-  font-family: "Haettenschweiler";
-  src: url("/fonts/haettenschweiler.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -103,8 +96,8 @@
     letter-spacing: 0.02em;
   }
   .font-poster {
-    font-family: "Haettenschweiler", Impact, "Arial Narrow", var(--font-display),
-      sans-serif;
+    font-family: var(--font-poster), Impact, "Arial Narrow",
+      var(--font-display), sans-serif;
     font-weight: 400;
     letter-spacing: 0.04em;
   }
