@@ -88,7 +88,6 @@ const memberList = [
   "Asaduddin Owaisi (MP, Hyderabad)",
   "Chandrashekhar Azad (MP, Nagina)",
   "Amritpal Singh (MP, Khadoor Sahib)",
-  "Independent Youth Delegate (Open Allocation)",
 ];
 
 // Custom Canvas-based Liquid QR Code Component matching reference design
@@ -724,7 +723,8 @@ export default function YpmClient() {
                 Submitting Application
               </h4>
               <p className="text-white/60 text-xs mt-2 leading-relaxed">
-                Please wait a moment while we process your application and notify the Secretariat...
+                Please wait a moment while we process your application and
+                notify the Secretariat...
               </p>
             </div>
           </motion.div>
@@ -805,18 +805,25 @@ export default function YpmClient() {
               </h3>
               <div className="space-y-4">
                 <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-                  This conference agenda focuses on modernizing India's educational ecosystem. It aims to foster constructive dialogue on shifting from rote learning to competency-based evaluation.
+                  This conference agenda focuses on modernizing India's
+                  educational ecosystem. It aims to foster constructive dialogue
+                  on shifting from rote learning to competency-based evaluation.
                 </p>
                 <p className="text-white/70 text-sm leading-relaxed">
-                  Key areas include integrating advanced technology for secure and transparent logistics, and institutionalizing continuous assessment to reduce student stress. The discussion emphasizes around growth, institutional resilience, and modernization.
+                  Key areas include integrating advanced technology for secure
+                  and transparent logistics, and institutionalizing continuous
+                  assessment to reduce student stress. The discussion emphasizes
+                  around growth, institutional resilience, and modernization.
                 </p>
                 <p className="text-white/70 text-sm leading-relaxed mb-4">
-                  Ultimately, the goal is to build a resilient, world-class assessment infrastructure through bipartisan cooperation.
+                  Ultimately, the goal is to build a resilient, world-class
+                  assessment infrastructure through bipartisan cooperation.
                 </p>
               </div>
               <div className="inline-flex items-center gap-2 text-xs font-heading font-semibold tracking-wider text-[#38bdf8] mt-2 bg-[#38bdf8]/10 px-3 py-1.5 rounded border border-[#38bdf8]/20">
                 <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
-                AGENDA: Discussions on comprehensive reforms to the Indian examination system.
+                AGENDA: Discussions on comprehensive reforms to the Indian
+                examination system.
               </div>
             </div>
 
@@ -939,9 +946,15 @@ export default function YpmClient() {
                 <span className="text-[#38bdf8] font-bold">
                   {formData.name}
                 </span>
-                . Your application for the <span className="font-poster" style={{ letterSpacing: "0.05em" }}>YOUTH PARLIAMENT</span> has been
-                successfully received. Our secretariat team will verify your
-                payment, review portfolio preferences, and send your
+                . Your application for the{" "}
+                <span
+                  className="font-poster"
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  YOUTH PARLIAMENT
+                </span>{" "}
+                has been successfully received. Our secretariat team will verify
+                your payment, review portfolio preferences, and send your
                 confirmation email.
               </p>
               <div className="bg-[#0a0a0a]/50 p-4 rounded-xl text-left border border-white/5 text-xs text-white/60 font-mono space-y-1">
@@ -998,8 +1011,13 @@ export default function YpmClient() {
               </h3>
               <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
                 Thank you for your interest! All delegate portfolios for the
-                <span className="font-poster" style={{ letterSpacing: "0.05em" }}>YOUTH PARLIAMENT (YPM)</span> have been allotted, and registrations are
-                now officially closed.
+                <span
+                  className="font-poster"
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  YOUTH PARLIAMENT (YPM)
+                </span>{" "}
+                have been allotted, and registrations are now officially closed.
               </p>
             </motion.div>
           ) : (
@@ -1347,7 +1365,9 @@ export default function YpmClient() {
                           }))
                         }
                         placeholder="e.g. 421589123456"
-                        disabled={formData.transactionId.startsWith("MUNSOC-REF-")}
+                        disabled={formData.transactionId.startsWith(
+                          "MUNSOC-REF-",
+                        )}
                         className="w-full bg-[#121212] border border-[#38bdf8]/35 focus:border-[#38bdf8] rounded-lg px-4 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none transition-all font-mono disabled:opacity-45 disabled:cursor-not-allowed"
                         required
                       />

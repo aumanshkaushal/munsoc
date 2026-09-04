@@ -8,7 +8,8 @@ import { ArrowRight } from "lucide-react";
 const AshokaChakra = () => (
   <svg
     viewBox="0 0 100 100"
-    className="inline-block w-[0.8em] h-[0.8em] text-[#38bdf8] mx-1 translate-y-[0.05em] animate-[spin_20s_linear_infinite]"
+    className="inline-block align-middle w-[0.8em] h-[0.8em] text-[#38bdf8] translate-y-[-0.1em] animate-[spin_20s_linear_infinite]"
+    style={{ marginLeft: "-0.01em", marginRight: "0.06em" }}
     fill="none"
     stroke="currentColor"
     strokeWidth="2.5"
@@ -16,7 +17,14 @@ const AshokaChakra = () => (
     <circle cx="50" cy="50" r="44" />
     <circle cx="50" cy="50" r="10" fill="currentColor" />
     {Array.from({ length: 24 }).map((_, i) => (
-      <line key={i} x1="50" y1="50" x2="50" y2="6" transform={`rotate(${i * 15} 50 50)`} />
+      <line
+        key={i}
+        x1="50"
+        y1="50"
+        x2="50"
+        y2="6"
+        transform={`rotate(${i * 15} 50 50)`}
+      />
     ))}
   </svg>
 );
@@ -40,26 +48,32 @@ export default function HeroSection() {
       {/* Massive Poster Text */}
       <div className="relative z-0 flex flex-col items-center w-full select-none pointer-events-none mt-8 pb-0">
         <div
-          className={`font-poster w-full text-center whitespace-nowrap flex items-center justify-center text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          className={`font-poster w-full text-center whitespace-nowrap text-white ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
             fontSize: "clamp(7rem, 24vw, 17rem)",
-            lineHeight: '0.8',
-            transform: 'scaleY(1.35)',
-            letterSpacing: '0.01em',
+            lineHeight: "0.8",
+            letterSpacing: "0.01em",
+            marginLeft: "-0.1em",
             animationDelay: reduce ? undefined : "0.1s",
             animationFillMode: reduce ? undefined : "both",
           }}
         >
-          Y<AshokaChakra />UTH
+          <span className="inline-block" style={{ transform: "scaleY(1.35)" }}>
+            Y
+          </span>
+          <AshokaChakra />
+          <span className="inline-block" style={{ transform: "scaleY(1.35)" }}>
+            UTH
+          </span>
         </div>
 
         <div
-          className={`font-poster w-full text-center whitespace-nowrap text-white/40 mt-6 sm:mt-12 ${reduce ? "" : "animate-hero-fade-in-up"}`}
+          className={`font-poster w-full text-center whitespace-nowrap text-white/40 mt-2 sm:mt-5 ${reduce ? "" : "animate-hero-fade-in-up"}`}
           style={{
             fontSize: "clamp(4rem, 16vw, 10rem)",
-            lineHeight: '0.8',
-            transform: 'scaleY(1.6)',
-            letterSpacing: '0.05em',
+            lineHeight: "0.8",
+            transform: "scaleY(1.6)",
+            letterSpacing: "0.05em",
             animationDelay: reduce ? undefined : "0.3s",
             animationFillMode: reduce ? undefined : "both",
           }}
@@ -88,36 +102,32 @@ export default function HeroSection() {
         </Link>
 
         <h1
-          className="font-display text-white leading-[0.95] text-balance"
-          style={{
-            fontSize: "clamp(2.4rem, 7.5vw, 5.5rem)",
-            letterSpacing: "0.04em",
-          }}
+          className="font-display text-white leading-[1.0] flex flex-col items-center text-center w-full"
+          style={{ letterSpacing: "0.04em" }}
         >
-          {["EMPOWERING", "THE"].map((word, i) => (
-            <span
-              key={word}
-              className={`inline-block mr-[0.22em] ${
-                reduce ? "" : "animate-hero-fade-in-up"
-              }`}
-              style={
-                {
-                  animationDelay: reduce ? undefined : `${0.55 + i * 0.08}s`,
-                  animationFillMode: reduce ? undefined : "both",
-                  ["--target-opacity" as any]: 1,
-                } as React.CSSProperties
-              }
-            >
-              {word}
-            </span>
-          ))}
+          {/* Line 1: EMPOWERING THE */}
           <span
-            className={`inline-block text-[#38bdf8] mr-[0.22em] ${
-              reduce ? "" : "animate-hero-fade-in-up"
-            }`}
+            className={`flex items-center justify-center gap-[0.22em] ${reduce ? "" : "animate-hero-fade-in-up"}`}
             style={
               {
-                animationDelay: reduce ? undefined : "0.71s",
+                fontSize: "clamp(2.4rem, 7.5vw, 5.5rem)",
+                animationDelay: reduce ? undefined : "0.55s",
+                animationFillMode: reduce ? undefined : "both",
+                ["--target-opacity" as any]: 1,
+              } as React.CSSProperties
+            }
+          >
+            <span>EMPOWERING</span>
+            <span>THE</span>
+          </span>
+
+          {/* Line 2: DIPLOMATS — scaled wider to match line width */}
+          <span
+            className={`text-[#38bdf8] ${reduce ? "" : "animate-hero-fade-in-up"}`}
+            style={
+              {
+                fontSize: "clamp(3.2rem, 10.5vw, 7.5rem)",
+                animationDelay: reduce ? undefined : "0.68s",
                 animationFillMode: reduce ? undefined : "both",
                 ["--target-opacity" as any]: 1,
               } as React.CSSProperties
@@ -125,13 +135,13 @@ export default function HeroSection() {
           >
             DIPLOMATS
           </span>
-          <br />
+
+          {/* Line 3: OF TOMORROW */}
           <span
-            className={`inline-block ${
-              reduce ? "" : "animate-hero-fade-in-up"
-            }`}
+            className={reduce ? "" : "animate-hero-fade-in-up"}
             style={
               {
+                fontSize: "clamp(2.4rem, 7.5vw, 5.5rem)",
                 animationDelay: reduce ? undefined : "0.8s",
                 animationFillMode: reduce ? undefined : "both",
                 ["--target-opacity" as any]: 1,
@@ -178,7 +188,7 @@ export default function HeroSection() {
           >
             <Link
               href="/committees/ypm"
-              className="bg-[#38bdf8] text-[#0a0a0a] font-display text-sm tracking-widest px-7 py-3 rounded-lg hover:bg-[#7dd3fc] transition-colors inline-block shadow-lg shadow-[#38bdf8]/25"
+              className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-medium text-sm tracking-widest px-7 py-3 rounded-lg hover:bg-[#7dd3fc] transition-colors inline-block shadow-lg shadow-[#38bdf8]/25"
               style={{ letterSpacing: "0.1em" }}
             >
               PARTICIPATE NOW

@@ -96,8 +96,7 @@
     letter-spacing: 0.02em;
   }
   .font-poster {
-    font-family: var(--font-poster), Impact, "Arial Narrow",
-      var(--font-display), sans-serif;
+    font-family: var(--font-poster), var(--font-display), Impact, "Arial Narrow", sans-serif;
     font-weight: 400;
     letter-spacing: 0.04em;
   }
