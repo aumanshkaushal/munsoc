@@ -797,19 +797,26 @@ export default function YpmClient() {
               <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
                 COMMITTEE OVERVIEW
               </div>
-              <h3 className="font-heading font-semibold text-white text-xl sm:text-2xl mb-3 tracking-wide">
-                Youth Parliament (YPM)
+              <h3 
+                className="text-white text-3xl sm:text-4xl mb-4 tracking-wide"
+                style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+              >
+                YOUTH PARLIAMENT (YPM)
               </h3>
-              <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-4">
-                The Youth Parliament (YPM) is a parliamentary assembly designed
-                to simulate the robust legislative discourse, policy debates,
-                and bills of the Indian Parliament. Delegates represent Members
-                of Parliament from diverse political ideologies, analyzing
-                policy reforms and working toward national consensus.
-              </p>
-              <div className="inline-flex items-center gap-2 text-xs font-heading font-medium tracking-wider text-[#38bdf8]">
+              <div className="space-y-4">
+                <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+                  This conference agenda focuses on modernizing India's educational ecosystem. It aims to foster constructive dialogue on shifting from rote learning to competency-based evaluation.
+                </p>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  Key areas include integrating advanced technology for secure and transparent logistics, and institutionalizing continuous assessment to reduce student stress. The discussion emphasizes around growth, institutional resilience, and modernization.
+                </p>
+                <p className="text-white/70 text-sm leading-relaxed mb-4">
+                  Ultimately, the goal is to build a resilient, world-class assessment infrastructure through bipartisan cooperation.
+                </p>
+              </div>
+              <div className="inline-flex items-center gap-2 text-xs font-heading font-semibold tracking-wider text-[#38bdf8] mt-2 bg-[#38bdf8]/10 px-3 py-1.5 rounded border border-[#38bdf8]/20">
                 <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
-                AGENDA: REVEALING SOON
+                AGENDA: Discussions on comprehensive reforms to the Indian examination system.
               </div>
             </div>
 
@@ -825,7 +832,7 @@ export default function YpmClient() {
                     Event Date
                   </span>
                   <span className="text-white text-sm font-semibold">
-                    10 October 2026 (Tentative)
+                    10 October 2026
                   </span>
                 </div>
               </div>
@@ -883,7 +890,10 @@ export default function YpmClient() {
           <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
             REGISTRATION &amp; PAYMENT PORTAL
           </div>
-          <h2 className="font-display text-white text-3xl tracking-wide uppercase">
+          <h2 
+            className="text-white text-4xl tracking-wide uppercase"
+            style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}
+          >
             APPLY FOR YOUTH PARLIAMENT
           </h2>
         </Reveal>
@@ -929,7 +939,7 @@ export default function YpmClient() {
                 <span className="text-[#38bdf8] font-bold">
                   {formData.name}
                 </span>
-                . Your application for the Youth Parliament has been
+                . Your application for the <span style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}>YOUTH PARLIAMENT</span> has been
                 successfully received. Our secretariat team will verify your
                 payment, review portfolio preferences, and send your
                 confirmation email.
@@ -988,7 +998,7 @@ export default function YpmClient() {
               </h3>
               <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
                 Thank you for your interest! All delegate portfolios for the
-                Youth Parliament (YPM) have been allotted, and registrations are
+                <span style={{ fontFamily: 'Haettenschweiler, Impact, sans-serif', letterSpacing: "0.05em" }}>YOUTH PARLIAMENT (YPM)</span> have been allotted, and registrations are
                 now officially closed.
               </p>
             </motion.div>
