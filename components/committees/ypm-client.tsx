@@ -24,7 +24,9 @@ import QRCode from "qrcode";
 // CONFIGURATION: Payment URI
 const UPI_ID = "manroopprsnl@oksbi";
 
-const memberList = [
+// Categorized Portfolios for Youth Parliament (YPM)
+export const GOVERNMENT_MEMBERS = [
+  "Raghav Chadha (MP (Rajya Sabha))",
   "Narendra Modi (Prime Minister)",
   "Amit Shah (Minister of Home Affairs)",
   "Rajnath Singh (Minister of Defence)",
@@ -54,6 +56,9 @@ const memberList = [
   "Bansuri Swaraj (MP, New Delhi)",
   "Kangana Ranaut (MP, Mandi)",
   "Giriraj Singh (Minister of Textiles)",
+];
+
+export const OPPOSITION_MEMBERS = [
   "Rahul Gandhi (Leader of the Opposition (Lok Sabha))",
   "Mallikarjun Kharge (Leader of the Opposition (Rajya Sabha))",
   "Shashi Tharoor (MP, Thiruvananthapuram)",
@@ -85,11 +90,12 @@ const memberList = [
   "Amra Ram (MP, Sikar)",
   "Thol. Thirumavalavan (MP, Chidambaram)",
   "Sanjay Singh (MP (Rajya Sabha))",
-  "Raghav Chadha (MP (Rajya Sabha))",
   "Asaduddin Owaisi (MP, Hyderabad)",
   "Chandrashekhar Azad (MP, Nagina)",
   "Amritpal Singh (MP, Khadoor Sahib)",
 ];
+
+export const memberList = [...GOVERNMENT_MEMBERS, ...OPPOSITION_MEMBERS];
 
 // Custom Canvas-based Liquid QR Code Component matching reference design
 interface MunsocQrCodeProps {
@@ -293,23 +299,29 @@ export function MunsocQrCode({ value, size = 260 }: MunsocQrCodeProps) {
   );
 }
 
-// Custom Searchable Dropdown for Portfolios
+// Custom Searchable Dropdown for Categorized Portfolios (Government vs Opposition)
 function CustomDropdown({
-  options,
   value,
   onChange,
   placeholder,
   disabled,
   selectedOtherValues,
   allottedList,
+  govCapped,
+  oppCapped,
+  govCount,
+  oppCount,
 }: {
-  options: string[];
   value: string;
   onChange: (val: string) => void;
   placeholder: string;
   disabled?: boolean;
   selectedOtherValues: string[];
   allottedList: string[];
+  govCapped?: boolean;
+  oppCapped?: boolean;
+  govCount?: number;
+  oppCount?: number;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -328,15 +340,70 @@ function CustomDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = [...options]
-    .filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => {
-      const aAllotted = allottedList.includes(a) && a !== value;
-      const bAllotted = allottedList.includes(b) && b !== value;
-      if (aAllotted && !bAllotted) return 1;
-      if (!aAllotted && bAllotted) return -1;
-      return 0;
-    });
+  const searchLower = search.toLowerCase().trim();
+
+  // Helper to filter and sort members of a side
+  const processSide = (members: string[], isSideCapped?: boolean) => {
+    return members
+      .filter((opt) => opt.toLowerCase().includes(searchLower))
+      .sort((a, b) => {
+        const aAllotted =
+          (allottedList.includes(a) || isSideCapped) && a !== value;
+        const bAllotted =
+          (allottedList.includes(b) || isSideCapped) && b !== value;
+        if (aAllotted && !bAllotted) return 1;
+        if (!aAllotted && bAllotted) return -1;
+        return 0;
+      });
+  };
+
+  const filteredGov = processSide(GOVERNMENT_MEMBERS, govCapped);
+  const filteredOpp = processSide(OPPOSITION_MEMBERS, oppCapped);
+  const totalResults = filteredGov.length + filteredOpp.length;
+
+  const isValueGov = GOVERNMENT_MEMBERS.includes(value);
+  const isValueOpp = OPPOSITION_MEMBERS.includes(value);
+
+  const renderOption = (opt: string, isSideCapped?: boolean) => {
+    const isSelectedElsewhere = selectedOtherValues.includes(opt);
+    const isAllotted = allottedList.includes(opt) || Boolean(isSideCapped);
+    const isCurrent = value === opt;
+    const isUnavailable = (isSelectedElsewhere || isAllotted) && !isCurrent;
+
+    return (
+      <li key={opt}>
+        <button
+          type="button"
+          disabled={isUnavailable}
+          onClick={() => {
+            onChange(opt);
+            setIsOpen(false);
+            setSearch("");
+          }}
+          className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-colors ${
+            isCurrent
+              ? "bg-[#38bdf8]/15 text-[#38bdf8] font-semibold"
+              : isUnavailable
+                ? "text-white/25 cursor-not-allowed opacity-40"
+                : "text-white/80 hover:bg-white/5 hover:text-white cursor-pointer"
+          }`}
+        >
+          <span className="truncate pr-2">{opt}</span>
+          {isCurrent ? (
+            <Check size={14} className="shrink-0 text-[#38bdf8]" />
+          ) : isAllotted || isSideCapped ? (
+            <span className="text-[9px] uppercase tracking-wider text-red-400/90 font-heading font-semibold bg-red-500/10 border border-red-500/25 px-1.5 py-0.5 rounded shrink-0">
+              Allotted
+            </span>
+          ) : isSelectedElsewhere ? (
+            <span className="text-[9px] uppercase tracking-wider text-white/30 font-heading shrink-0">
+              Selected
+            </span>
+          ) : null}
+        </button>
+      </li>
+    );
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -350,12 +417,28 @@ function CustomDropdown({
           disabled ? "opacity-50 cursor-not-allowed" : "hover:border-white/20"
         }`}
       >
-        <span className={value ? "text-white font-medium" : "text-white/40"}>
-          {value || placeholder}
-        </span>
+        <div className="flex items-center gap-2 truncate pr-2">
+          {value && isValueGov && (
+            <span className="text-[9px] uppercase tracking-wider font-heading font-bold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
+              Govt
+            </span>
+          )}
+          {value && isValueOpp && (
+            <span className="text-[9px] uppercase tracking-wider font-heading font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+              Opp
+            </span>
+          )}
+          <span
+            className={
+              value ? "text-white font-medium truncate" : "text-white/40"
+            }
+          >
+            {value || placeholder}
+          </span>
+        </div>
         <ChevronDown
           size={16}
-          className={`text-white/40 transition-transform duration-200 ${
+          className={`text-white/40 transition-transform duration-200 shrink-0 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -363,81 +446,95 @@ function CustomDropdown({
 
       {isOpen && (
         <div className="absolute z-50 left-0 right-0 mt-2 bg-[#1c1c1e] border border-white/10 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
-          <div className="p-2 border-b border-white/10">
+          <div className="p-2.5 border-b border-white/10 relative">
             <input
               type="text"
               autoFocus
-              placeholder="Search portfolio..."
+              placeholder="Search MP name, ministry, or constituency..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#121212] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#38bdf8]"
+              className="w-full bg-[#121212] border border-white/10 rounded-lg pl-8 pr-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#38bdf8] transition-colors"
             />
+            <svg
+              className="absolute left-5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
-          <ul className="max-h-56 overflow-y-auto p-1.5 space-y-1">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt, idx) => {
-                const isSelectedElsewhere = selectedOtherValues.includes(opt);
-                const isAllotted = allottedList.includes(opt);
-                const isCurrent = value === opt;
-                const isUnavailable =
-                  (isSelectedElsewhere || isAllotted) && !isCurrent;
 
-                const prevOpt = idx > 0 ? filteredOptions[idx - 1] : null;
-                const isFirstAllotted =
-                  isAllotted &&
-                  !isCurrent &&
-                  prevOpt &&
-                  (!allottedList.includes(prevOpt) || prevOpt === value);
-
-                return (
-                  <li key={opt}>
-                    {isFirstAllotted && (
-                      <div className="pt-2.5 pb-1 px-2 flex items-center gap-2 select-none my-1">
-                        <div className="h-[1px] flex-1 bg-white/10" />
-                        <span className="text-[9px] uppercase font-heading tracking-widest text-red-400/60 font-semibold">
-                          Allotted Portfolios
+          <div className="max-h-64 overflow-y-auto p-1.5 space-y-3">
+            {totalResults > 0 ? (
+              <>
+                {/* Government Section */}
+                {filteredGov.length > 0 && (
+                  <div>
+                    <div className="sticky top-0 bg-[#1c1c1e]/95 backdrop-blur z-10 px-2.5 py-1.5 mb-1 flex items-center justify-between border-b border-blue-500/20 rounded">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
+                        <span className="text-[11px] font-heading font-bold uppercase tracking-wider text-blue-300">
+                          Government Side ({GOVERNMENT_MEMBERS.length})
                         </span>
-                        <div className="h-[1px] flex-1 bg-white/10" />
                       </div>
-                    )}
-                    <button
-                      type="button"
-                      disabled={isUnavailable}
-                      onClick={() => {
-                        onChange(opt);
-                        setIsOpen(false);
-                        setSearch("");
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-colors ${
-                        isCurrent
-                          ? "bg-[#38bdf8]/15 text-[#38bdf8] font-semibold"
-                          : isUnavailable
-                            ? "text-white/20 cursor-not-allowed opacity-40"
-                            : "text-white/80 hover:bg-white/5 hover:text-white cursor-pointer"
-                      }`}
-                    >
-                      <span className="truncate pr-2">{opt}</span>
-                      {isCurrent ? (
-                        <Check size={14} className="shrink-0 text-[#38bdf8]" />
-                      ) : isAllotted ? (
-                        <span className="text-[9px] uppercase tracking-wider text-red-400/80 font-heading border border-red-500/20 px-1.5 py-0.5 rounded shrink-0">
-                          Allotted
+                      {govCapped ? (
+                        <span className="text-red-400 bg-red-500/15 border border-red-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                          25/25 Allotted &bull; Capped
                         </span>
-                      ) : isSelectedElsewhere ? (
-                        <span className="text-[9px] uppercase tracking-wider text-white/30 font-heading shrink-0">
-                          Selected
+                      ) : (
+                        <span className="text-blue-300/80 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">
+                          {typeof govCount === "number"
+                            ? `${govCount}/25 Allotted`
+                            : "Available"}
                         </span>
-                      ) : null}
-                    </button>
-                  </li>
-                );
-              })
+                      )}
+                    </div>
+                    <ul className="space-y-1">
+                      {filteredGov.map((opt) => renderOption(opt, govCapped))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Opposition Section */}
+                {filteredOpp.length > 0 && (
+                  <div>
+                    <div className="sticky top-0 bg-[#1c1c1e]/95 backdrop-blur z-10 px-2.5 py-1.5 mb-1 flex items-center justify-between border-b border-amber-500/20 rounded">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        <span className="text-[11px] font-heading font-bold uppercase tracking-wider text-amber-300">
+                          Opposition Side ({OPPOSITION_MEMBERS.length})
+                        </span>
+                      </div>
+                      {oppCapped ? (
+                        <span className="text-red-400 bg-red-500/15 border border-red-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                          25/25 Allotted &bull; Capped
+                        </span>
+                      ) : (
+                        <span className="text-amber-300/80 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-mono font-semibold">
+                          {typeof oppCount === "number"
+                            ? `${oppCount}/25 Allotted`
+                            : "Available"}
+                        </span>
+                      )}
+                    </div>
+                    <ul className="space-y-1">
+                      {filteredOpp.map((opt) => renderOption(opt, oppCapped))}
+                    </ul>
+                  </div>
+                )}
+              </>
             ) : (
-              <li className="p-3 text-center text-xs text-white/40">
+              <div className="p-4 text-center text-xs text-white/40">
                 No matching portfolios found.
-              </li>
+              </div>
             )}
-          </ul>
+          </div>
         </div>
       )}
     </div>
@@ -458,6 +555,11 @@ export default function YpmClient() {
   });
 
   const [allottedPortfolios, setAllottedPortfolios] = useState<string[]>([]);
+  const [govCount, setGovCount] = useState<number>(0);
+  const [oppCount, setOppCount] = useState<number>(0);
+  const [isGovCapped, setIsGovCapped] = useState<boolean>(false);
+  const [isOppCapped, setIsOppCapped] = useState<boolean>(false);
+  const [isClosed, setIsClosed] = useState<boolean>(false);
   const [isLoadingPortfolios, setIsLoadingPortfolios] = useState<boolean>(true);
   const [isRateLimitedClient, setIsRateLimitedClient] = useState(false);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
@@ -581,12 +683,54 @@ export default function YpmClient() {
       const res = await fetch("/api/register");
       if (res.ok) {
         const data = await res.json();
-        const list = Array.isArray(data.allottedPortfolios)
+        const rawList: string[] = Array.isArray(data.allottedPortfolios)
           ? data.allottedPortfolios
           : Array.isArray(data.allotted)
             ? data.allotted
             : [];
-        setAllottedPortfolios(list);
+
+        const actualAllotted: string[] =
+          Array.isArray(data.actualAllotted) && data.actualAllotted.length > 0
+            ? data.actualAllotted
+            : rawList;
+
+        const countGov = actualAllotted.filter((p) =>
+          GOVERNMENT_MEMBERS.some(
+            (m) => m.trim().toLowerCase() === p.trim().toLowerCase(),
+          ),
+        ).length;
+
+        const countOpp = actualAllotted.filter((p) =>
+          OPPOSITION_MEMBERS.some(
+            (m) => m.trim().toLowerCase() === p.trim().toLowerCase(),
+          ),
+        ).length;
+
+        const govFilled =
+          typeof data.govCount === "number" ? data.govCount : countGov;
+        const oppFilled =
+          typeof data.oppCount === "number" ? data.oppCount : countOpp;
+
+        const govCapReached = Boolean(data.isGovCapped) || govFilled >= 25;
+        const oppCapReached = Boolean(data.isOppCapped) || oppFilled >= 25;
+
+        setGovCount(govFilled);
+        setOppCount(oppFilled);
+        setIsGovCapped(govCapReached);
+        setIsOppCapped(oppCapReached);
+        setIsClosed(Boolean(data.isClosed) || (govCapReached && oppCapReached));
+
+        // When one side reaches 25, all MPs on that side get marked Allotted!
+        const effectiveList = new Set<string>(rawList);
+        if (govCapReached) {
+          GOVERNMENT_MEMBERS.forEach((m) => effectiveList.add(m));
+        }
+        if (oppCapReached) {
+          OPPOSITION_MEMBERS.forEach((m) => effectiveList.add(m));
+        }
+
+        setAllottedPortfolios(Array.from(effectiveList));
+
         if (data.rateLimited) {
           setIsRateLimitedClient(true);
         }
@@ -641,14 +785,31 @@ export default function YpmClient() {
       return;
     }
 
+    const isGov = (p: string) =>
+      GOVERNMENT_MEMBERS.some(
+        (m) => m.trim().toLowerCase() === (p || "").trim().toLowerCase(),
+      );
+    const isOpp = (p: string) =>
+      OPPOSITION_MEMBERS.some(
+        (m) => m.trim().toLowerCase() === (p || "").trim().toLowerCase(),
+      );
+
     if (
+      (isGovCapped &&
+        (isGov(formData.pref1) ||
+          isGov(formData.pref2) ||
+          isGov(formData.pref3))) ||
+      (isOppCapped &&
+        (isOpp(formData.pref1) ||
+          isOpp(formData.pref2) ||
+          isOpp(formData.pref3))) ||
       allottedPortfolios.includes(formData.pref1) ||
       allottedPortfolios.includes(formData.pref2) ||
       allottedPortfolios.includes(formData.pref3)
     ) {
       showCustomAlert(
         "Portfolio Unavailable",
-        "One or more of your selected preferences has already been allotted to another delegate. Please select from the available portfolios.",
+        "One or more of your selected preferences has already been allotted or belongs to a side that has reached its 25-member capacity. Please select from available portfolios.",
       );
       return;
     }
@@ -1105,7 +1266,10 @@ export default function YpmClient() {
               </div>
             </motion.div>
           ) : !isLoadingPortfolios &&
-            allottedPortfolios.length >= memberList.length ? (
+            (isClosed ||
+              (isGovCapped && isOppCapped) ||
+              (govCount >= 25 && oppCount >= 25) ||
+              allottedPortfolios.length >= memberList.length) ? (
             <motion.div
               key="registrations-closed"
               initial={{ scale: 0.95, opacity: 0, y: 15 }}
@@ -1121,14 +1285,16 @@ export default function YpmClient() {
                 Registrations Closed
               </h3>
               <p className="text-white/60 text-xs sm:text-sm leading-relaxed">
-                Thank you for your interest! All delegate portfolios for the
+                Thank you for your interest! All delegate portfolios for the{" "}
                 <span
                   className="font-poster"
                   style={{ letterSpacing: "0.05em" }}
                 >
                   YOUTH PARLIAMENT (YPM)
                 </span>{" "}
-                have been allotted, and registrations are now officially closed.
+                have been allotted (both Government and Opposition sides have
+                reached maximum capacity), and registrations are now officially
+                closed.
               </p>
             </motion.div>
           ) : (
@@ -1223,6 +1389,97 @@ export default function YpmClient() {
                       </h4>
                     </div>
 
+                    {/* Side Capacity Status Tracker */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                      {/* Government side status */}
+                      <div
+                        className={`p-3 rounded-xl border transition-all ${
+                          isGovCapped
+                            ? "bg-red-500/10 border-red-500/30 text-red-300"
+                            : "bg-blue-500/10 border-blue-500/20 text-blue-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-xs font-heading font-semibold">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
+                            <span className="font-heading font-bold text-xs uppercase tracking-wider text-white">
+                              Government Side ({GOVERNMENT_MEMBERS.length})
+                            </span>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                              isGovCapped
+                                ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                                : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                            }`}
+                          >
+                            {isGovCapped
+                              ? "25/25 ALLOTTED (CAPPED)"
+                              : `${govCount}/25 ALLOTTED`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isGovCapped ? "bg-red-400" : "bg-[#38bdf8]"
+                            }`}
+                            style={{
+                              width: `${Math.min(100, (govCount / 25) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <p className="text-[10px] mt-1.5 text-white/50">
+                          {isGovCapped
+                            ? "25/25 Government seats allotted. All Government MPs marked Allotted."
+                            : `${Math.max(0, 25 - govCount)} seat${25 - govCount === 1 ? "" : "s"} remaining.`}
+                        </p>
+                      </div>
+
+                      {/* Opposition side status */}
+                      <div
+                        className={`p-3 rounded-xl border transition-all ${
+                          isOppCapped
+                            ? "bg-red-500/10 border-red-500/30 text-red-300"
+                            : "bg-amber-500/10 border-amber-500/20 text-amber-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-xs font-heading font-semibold">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-400" />
+                            <span className="font-heading font-bold text-xs uppercase tracking-wider text-white">
+                              Opposition Side ({OPPOSITION_MEMBERS.length})
+                            </span>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                              isOppCapped
+                                ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                                : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                            }`}
+                          >
+                            {isOppCapped
+                              ? "25/25 ALLOTTED (CAPPED)"
+                              : `${oppCount}/25 ALLOTTED`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full mt-2.5 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isOppCapped ? "bg-red-400" : "bg-amber-400"
+                            }`}
+                            style={{
+                              width: `${Math.min(100, (oppCount / 25) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <p className="text-[10px] mt-1.5 text-white/50">
+                          {isOppCapped
+                            ? "25/25 Opposition seats allotted. All Opposition MPs marked Allotted."
+                            : `${Math.max(0, 25 - oppCount)} seat${25 - oppCount === 1 ? "" : "s"} remaining.`}
+                        </p>
+                      </div>
+                    </div>
+
                     {isLoadingPortfolios ? (
                       <div className="bg-[#121212] border border-white/5 rounded-xl p-8 flex flex-col items-center justify-center gap-4 text-center">
                         <div className="w-10 h-10 border-[3px] border-[#38bdf8]/20 border-t-[#38bdf8] rounded-full animate-spin" />
@@ -1240,7 +1497,6 @@ export default function YpmClient() {
                           </span>
                           <CustomDropdown
                             disabled={isPaymentVerified}
-                            options={memberList}
                             value={formData.pref1}
                             onChange={(val) =>
                               handleDropdownChange("pref1", val)
@@ -1251,6 +1507,10 @@ export default function YpmClient() {
                               formData.pref3,
                             ]}
                             allottedList={allottedPortfolios}
+                            govCapped={isGovCapped}
+                            oppCapped={isOppCapped}
+                            govCount={govCount}
+                            oppCount={oppCount}
                           />
                         </div>
                         <div className="space-y-1">
@@ -1259,7 +1519,6 @@ export default function YpmClient() {
                           </span>
                           <CustomDropdown
                             disabled={isPaymentVerified}
-                            options={memberList}
                             value={formData.pref2}
                             onChange={(val) =>
                               handleDropdownChange("pref2", val)
@@ -1270,6 +1529,10 @@ export default function YpmClient() {
                               formData.pref3,
                             ]}
                             allottedList={allottedPortfolios}
+                            govCapped={isGovCapped}
+                            oppCapped={isOppCapped}
+                            govCount={govCount}
+                            oppCount={oppCount}
                           />
                         </div>
                         <div className="space-y-1">
@@ -1278,7 +1541,6 @@ export default function YpmClient() {
                           </span>
                           <CustomDropdown
                             disabled={isPaymentVerified}
-                            options={memberList}
                             value={formData.pref3}
                             onChange={(val) =>
                               handleDropdownChange("pref3", val)
@@ -1289,6 +1551,10 @@ export default function YpmClient() {
                               formData.pref2,
                             ]}
                             allottedList={allottedPortfolios}
+                            govCapped={isGovCapped}
+                            oppCapped={isOppCapped}
+                            govCount={govCount}
+                            oppCount={oppCount}
                           />
                         </div>
                       </div>

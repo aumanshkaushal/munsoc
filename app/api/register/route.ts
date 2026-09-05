@@ -634,6 +634,15 @@ export async function GET(req: NextRequest) {
         allotted: allottedList,
         allottedPortfolios: allottedList,
         totalAllotted: allottedList.length,
+        actualAllotted: Array.isArray(result.actualAllotted)
+          ? result.actualAllotted
+          : [],
+        govCount: typeof result.govCount === "number" ? result.govCount : 0,
+        oppCount: typeof result.oppCount === "number" ? result.oppCount : 0,
+        sideLimit:
+          typeof result.sideLimit === "number" ? result.sideLimit : 25,
+        isGovCapped: Boolean(result.isGovCapped),
+        isOppCapped: Boolean(result.isOppCapped),
         isClosed: Boolean(result.isClosed || result.closed),
         rateLimited,
       });
