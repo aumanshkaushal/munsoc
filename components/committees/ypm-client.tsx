@@ -328,9 +328,15 @@ function CustomDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredOptions = [...options]
+    .filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      const aAllotted = allottedList.includes(a) && a !== value;
+      const bAllotted = allottedList.includes(b) && b !== value;
+      if (aAllotted && !bAllotted) return 1;
+      if (!aAllotted && bAllotted) return -1;
+      return 0;
+    });
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -369,15 +375,31 @@ function CustomDropdown({
           </div>
           <ul className="max-h-56 overflow-y-auto p-1.5 space-y-1">
             {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt) => {
+              filteredOptions.map((opt, idx) => {
                 const isSelectedElsewhere = selectedOtherValues.includes(opt);
                 const isAllotted = allottedList.includes(opt);
                 const isCurrent = value === opt;
                 const isUnavailable =
                   (isSelectedElsewhere || isAllotted) && !isCurrent;
 
+                const prevOpt = idx > 0 ? filteredOptions[idx - 1] : null;
+                const isFirstAllotted =
+                  isAllotted &&
+                  !isCurrent &&
+                  prevOpt &&
+                  (!allottedList.includes(prevOpt) || prevOpt === value);
+
                 return (
                   <li key={opt}>
+                    {isFirstAllotted && (
+                      <div className="pt-2.5 pb-1 px-2 flex items-center gap-2 select-none my-1">
+                        <div className="h-[1px] flex-1 bg-white/10" />
+                        <span className="text-[9px] uppercase font-heading tracking-widest text-red-400/60 font-semibold">
+                          Allotted Portfolios
+                        </span>
+                        <div className="h-[1px] flex-1 bg-white/10" />
+                      </div>
+                    )}
                     <button
                       type="button"
                       disabled={isUnavailable}
@@ -650,6 +672,7 @@ export default function YpmClient() {
       "Warning: If you close this payment session, you will lose your progress and have to refill the form. Are you sure you want to go back?",
       () => {
         setIsPaymentModalOpen(false);
+        setCustomDialog((prev) => ({ ...prev, isOpen: false }));
         setFormData({
           name: "",
           email: "",
@@ -703,6 +726,9 @@ export default function YpmClient() {
       if (res.ok && data.success) {
         setIsPaymentModalOpen(false);
         setSubmitted(true);
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
       } else {
         showCustomAlert(
           "Submission Issue",
@@ -756,179 +782,207 @@ export default function YpmClient() {
         )}
       </AnimatePresence>
 
-      {/* Visual Stepper */}
-      <div className="mb-14">
-        <div className="flex items-center justify-between max-w-md mx-auto relative">
-          <div className="absolute left-0 top-4 -translate-y-1/2 h-[2px] w-full bg-white/10 -z-0" />
-          <div
-            className="absolute left-0 top-4 -translate-y-1/2 h-[2px] bg-[#38bdf8] transition-all duration-500 -z-0"
-            style={{
-              width:
-                currentActiveStep === 1
-                  ? "0%"
-                  : currentActiveStep === 2
-                    ? "50%"
-                    : "100%",
-            }}
-          />
-
-          {[
-            { step: 1, label: "Details" },
-            { step: 2, label: "Payment" },
-            { step: 3, label: "Submitted" },
-          ].map((item) => {
-            const isDone = currentActiveStep > item.step || submitted;
-            const isCurrent = currentActiveStep === item.step && !submitted;
-
-            return (
-              <div
-                key={item.step}
-                className="flex flex-col items-center gap-2 relative z-10"
-              >
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-xs font-bold transition-all duration-300 ${
-                    isDone
-                      ? "bg-[#38bdf8] text-[#0a0a0a] shadow-lg shadow-[#38bdf8]/25"
-                      : isCurrent
-                        ? "bg-[#1c1c1e] text-[#38bdf8] border-2 border-[#38bdf8] shadow-md shadow-[#38bdf8]/10"
-                        : "bg-[#1c1c1e] text-white/40 border border-white/10"
-                  }`}
-                >
-                  {isDone ? <Check size={14} strokeWidth={3} /> : item.step}
-                </div>
-                <span
-                  className={`text-[10px] font-heading tracking-wider uppercase font-semibold transition-colors ${
-                    isCurrent || isDone ? "text-white" : "text-white/40"
-                  }`}
-                >
-                  {item.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Committee Overview & Information Panel */}
-      <div className="mb-14">
-        <Reveal className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-          <div
-            className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-[#38bdf8]/5 blur-[80px]"
-            aria-hidden
-          />
+      {!submitted && (
+        <div className="mb-14">
+          <Reveal className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+            <div
+              className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-[#38bdf8]/5 blur-[80px]"
+              aria-hidden
+            />
 
-          <div className="relative z-10 flex flex-col gap-6">
-            <div>
-              <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
-                COMMITTEE OVERVIEW
+            <div className="relative z-10 flex flex-col gap-6">
+              <div>
+                <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
+                  COMMITTEE OVERVIEW
+                </div>
+                <h3
+                  className="font-poster text-white text-3xl sm:text-4xl mb-4 tracking-wide leading-[0.95]"
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  YOUTH PARLIAMENT (YPM)
+                </h3>
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 text-xs font-heading font-semibold tracking-wider text-[#38bdf8] mt-2 bg-[#38bdf8]/10 px-3 py-1.5 rounded border border-[#38bdf8]/20">
+                    <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
+                    AGENDA: Discussions on comprehensive reforms to the Indian
+                    examination system.
+                  </div>
+                  <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+                    This conference agenda focuses on modernizing India's
+                    educational ecosystem. It aims to foster constructive
+                    dialogue on shifting from rote learning to competency-based
+                    evaluation.
+                  </p>
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    Key areas include integrating advanced technology for secure
+                    and transparent logistics, and institutionalizing continuous
+                    assessment to reduce student stress. The discussion
+                    emphasizes around growth, institutional resilience, and
+                    modernization.
+                  </p>
+                  <p className="text-white/70 text-sm leading-relaxed mb-4">
+                    Ultimately, the goal is to build a resilient, world-class
+                    assessment infrastructure through bipartisan cooperation.
+                  </p>
+                </div>
               </div>
-              <h3
-                className="font-poster text-white text-3xl sm:text-4xl mb-4 tracking-wide leading-[0.95]"
-                style={{ letterSpacing: "0.05em" }}
-              >
-                YOUTH PARLIAMENT (YPM)
-              </h3>
-              <div className="space-y-4">
-                <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-                  This conference agenda focuses on modernizing India's
-                  educational ecosystem. It aims to foster constructive dialogue
-                  on shifting from rote learning to competency-based evaluation.
-                </p>
-                <p className="text-white/70 text-sm leading-relaxed">
-                  Key areas include integrating advanced technology for secure
-                  and transparent logistics, and institutionalizing continuous
-                  assessment to reduce student stress. The discussion emphasizes
-                  around growth, institutional resilience, and modernization.
-                </p>
-                <p className="text-white/70 text-sm leading-relaxed mb-4">
-                  Ultimately, the goal is to build a resilient, world-class
-                  assessment infrastructure through bipartisan cooperation.
-                </p>
-              </div>
-              <div className="inline-flex items-center gap-2 text-xs font-heading font-semibold tracking-wider text-[#38bdf8] mt-2 bg-[#38bdf8]/10 px-3 py-1.5 rounded border border-[#38bdf8]/20">
-                <span className="w-1.5 h-1.5 bg-[#38bdf8] rounded-full animate-ping" />
-                AGENDA: Discussions on comprehensive reforms to the Indian
-                examination system.
+
+              {/* Event Specs Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-6">
+                {/* Date */}
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
+                    <Calendar size={18} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
+                      Event Date
+                    </span>
+                    <span className="text-white text-sm font-semibold">
+                      10 October 2026
+                    </span>
+                  </div>
+                </div>
+
+                {/* Timings */}
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
+                    <Clock size={18} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
+                      Timings
+                    </span>
+                    <span className="text-white text-sm font-semibold">
+                      9:00 AM - 5:00 PM
+                    </span>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="flex items-center gap-4 border-t border-white/5 pt-4">
+                  <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
+                    <Laptop size={18} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
+                      Mode &amp; Venue
+                    </span>
+                    <span className="text-white text-sm font-semibold">
+                      Offline &bull; NIT Jalandhar
+                    </span>
+                  </div>
+                </div>
+
+                {/* Registration Fee */}
+                <div className="flex items-center gap-4 border-t border-white/5 pt-4">
+                  <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
+                    <Coins size={18} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
+                      Registration Fee
+                    </span>
+                    <span className="text-white text-sm font-semibold">
+                      ₹300
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Event Specs Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/5 pt-6">
-              {/* Date */}
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
-                    Event Date
-                  </span>
-                  <span className="text-white text-sm font-semibold">
-                    10 October 2026 (Tentative)
-                  </span>
-                </div>
-              </div>
-
-              {/* Timings */}
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
-                  <Clock size={18} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
-                    Timings
-                  </span>
-                  <span className="text-white text-sm font-semibold">
-                    9:00 AM - 5:00 PM
-                  </span>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="flex items-center gap-4 border-t border-white/5 pt-4">
-                <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
-                  <Laptop size={18} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
-                    Mode &amp; Venue
-                  </span>
-                  <span className="text-white text-sm font-semibold">
-                    Offline &bull; NIT Jalandhar
-                  </span>
-                </div>
-              </div>
-
-              {/* Registration Fee */}
-              <div className="flex items-center gap-4 border-t border-white/5 pt-4">
-                <div className="w-10 h-10 bg-[#38bdf8]/10 rounded-full flex items-center justify-center shrink-0 text-[#38bdf8]">
-                  <Coins size={18} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-white/40 block font-heading tracking-wider uppercase">
-                    Registration Fee
-                  </span>
-                  <span className="text-white text-sm font-semibold">₹300</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
+          </Reveal>
+        </div>
+      )}
 
       {/* Application Form & Pay Section */}
       <div id="apply-now" className="scroll-mt-24">
-        <Reveal className="text-center mb-12">
-          <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
-            REGISTRATION &amp; PAYMENT PORTAL
+        {!submitted && (
+          <Reveal className="text-center mb-8">
+            <div className="inline-block border border-[#38bdf8]/30 text-[#38bdf8] text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-4 uppercase">
+              REGISTRATION &amp; PAYMENT PORTAL
+            </div>
+            <h2
+              className="font-poster text-white text-4xl tracking-wide uppercase leading-[0.95]"
+              style={{ letterSpacing: "0.05em" }}
+            >
+              APPLY FOR YOUTH PARLIAMENT
+            </h2>
+          </Reveal>
+        )}
+
+        {/* Step Progress Tracker */}
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="bg-[#1c1c1e] border border-white/5 rounded-2xl p-2 sm:p-2.5 shadow-2xl shadow-black/40">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+              {[
+                { step: 1, title: "Details", desc: "Delegate info" },
+                { step: 2, title: "Payment", desc: "₹300 Fee" },
+                { step: 3, title: "Submitted", desc: "Confirmation" },
+              ].map((item) => {
+                const isCompleted = submitted || currentActiveStep > item.step;
+                const isActive = !submitted && currentActiveStep === item.step;
+
+                return (
+                  <div
+                    key={item.step}
+                    className={`flex items-center gap-2 sm:gap-3 px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-300 relative overflow-hidden ${
+                      isActive
+                        ? "bg-[#38bdf8]/10 border border-[#38bdf8]/30 shadow-md shadow-[#38bdf8]/10"
+                        : isCompleted
+                          ? "bg-emerald-500/5 border border-emerald-500/20"
+                          : "bg-[#121212]/50 border border-white/5 opacity-40"
+                    }`}
+                  >
+                    <div
+                      className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-heading text-xs font-bold shrink-0 transition-colors ${
+                        isCompleted
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                          : isActive
+                            ? "bg-[#38bdf8] text-[#0a0a0a] shadow-md shadow-[#38bdf8]/25"
+                            : "bg-white/5 text-white/40 border border-white/10"
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <Check size={14} strokeWidth={3} />
+                      ) : (
+                        `0${item.step}`
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span
+                        className={`text-xs sm:text-sm font-heading tracking-wide uppercase font-bold truncate block ${
+                          isActive
+                            ? "text-white"
+                            : isCompleted
+                              ? "text-emerald-300"
+                              : "text-white/60"
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                      <span
+                        className={`text-[9px] sm:text-[10px] font-heading tracking-wider uppercase block truncate mt-0.5 ${
+                          isActive
+                            ? "text-[#38bdf8]"
+                            : isCompleted
+                              ? "text-emerald-400/80"
+                              : "text-white/30"
+                        }`}
+                      >
+                        {isCompleted
+                          ? "Completed"
+                          : isActive
+                            ? "In Progress"
+                            : item.desc}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <h2
-            className="font-poster text-white text-4xl tracking-wide uppercase leading-[0.95]"
-            style={{ letterSpacing: "0.05em" }}
-          >
-            APPLY FOR YOUTH PARLIAMENT
-          </h2>
-        </Reveal>
+        </div>
 
         <AnimatePresence mode="wait">
           {isRateLimitedClient ? (
@@ -972,45 +1026,76 @@ export default function YpmClient() {
                   {formData.name}
                 </span>
                 . Your application for the{" "}
-                <span
-                  className="font-poster"
-                  style={{ letterSpacing: "0.05em" }}
-                >
-                  YOUTH PARLIAMENT
-                </span>{" "}
+                <strong className="text-white font-semibold">
+                  Youth Parliament (YPM)
+                </strong>{" "}
                 has been successfully received. Our secretariat team will verify
                 your payment, review portfolio preferences, and send your
                 confirmation email.
               </p>
-              <div className="bg-[#0a0a0a]/50 p-4 rounded-xl text-left border border-white/5 text-xs text-white/60 font-mono space-y-1">
-                <div>
-                  <span className="text-white/40">Email:</span> {formData.email}
+
+              {/* Receipt / Registration Summary Card */}
+              <div className="bg-[#121212] border border-white/10 rounded-xl p-5 text-left space-y-4">
+                {/* Contact row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-white/5 text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase font-heading tracking-wider text-white/40 block mb-0.5">
+                      Email Address
+                    </span>
+                    <span className="text-white font-medium break-all">
+                      {formData.email}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-heading tracking-wider text-white/40 block mb-0.5">
+                      WhatsApp
+                    </span>
+                    <span className="text-white font-medium">
+                      {formData.whatsapp}
+                    </span>
+                  </div>
                 </div>
+
+                {/* Portfolio preferences row */}
                 <div>
-                  <span className="text-white/40">WhatsApp:</span>{" "}
-                  {formData.whatsapp}
+                  <span className="text-[10px] uppercase font-heading tracking-wider text-white/40 block mb-2">
+                    Submitted Preferences
+                  </span>
+                  <div className="space-y-1.5">
+                    {[
+                      { rank: 1, val: formData.pref1 },
+                      { rank: 2, val: formData.pref2 },
+                      { rank: 3, val: formData.pref3 },
+                    ].map((pref) => (
+                      <div
+                        key={pref.rank}
+                        className="flex items-center gap-2.5 bg-white/[0.03] border border-white/5 rounded-lg px-3 py-2 text-xs"
+                      >
+                        <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold font-heading bg-[#38bdf8]/15 text-[#38bdf8] shrink-0">
+                          {pref.rank}
+                        </span>
+                        <span className="text-white/80 truncate font-medium">
+                          {pref.val || "—"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <span className="text-white/40">Pref 1:</span>{" "}
-                  {formData.pref1}
-                </div>
-                <div>
-                  <span className="text-white/40">Pref 2:</span>{" "}
-                  {formData.pref2}
-                </div>
-                <div>
-                  <span className="text-white/40">Pref 3:</span>{" "}
-                  {formData.pref3}
-                </div>
-                <div>
-                  <span className="text-white/40">Txn / Ref ID:</span>{" "}
-                  {formData.transactionId}
+
+                {/* Transaction reference */}
+                <div className="pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                  <span className="text-[10px] uppercase font-heading tracking-wider text-white/40">
+                    Payment Reference
+                  </span>
+                  <span className="font-mono text-[11px] text-[#38bdf8] bg-[#38bdf8]/10 border border-[#38bdf8]/20 px-2.5 py-1 rounded w-fit break-all">
+                    {formData.transactionId}
+                  </span>
                 </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-white/10">
                 <a
-                  href="https://chat.whatsapp.com/IFbG2gOm3gvHSB5Vi4sIr5"
+                  href="https://chat.whatsapp.com/DntwTYWxgvaJIpjhpTQ577"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-3 rounded-lg hover:bg-[#7dd3fc] transition-all inline-block shadow-lg shadow-[#38bdf8]/20"
@@ -1019,7 +1104,8 @@ export default function YpmClient() {
                 </a>
               </div>
             </motion.div>
-          ) : !isLoadingPortfolios && allottedPortfolios.length >= memberList.length ? (
+          ) : !isLoadingPortfolios &&
+            allottedPortfolios.length >= memberList.length ? (
             <motion.div
               key="registrations-closed"
               initial={{ scale: 0.95, opacity: 0, y: 15 }}
@@ -1107,7 +1193,7 @@ export default function YpmClient() {
                         disabled={isPaymentVerified}
                         value={formData.whatsapp}
                         onChange={handleChange}
-                        placeholder="+91 98765 43210"
+                        placeholder="98765 43210"
                         className="w-full bg-[#121212] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#38bdf8] transition-colors disabled:opacity-50"
                       />
                     </div>
@@ -1135,26 +1221,15 @@ export default function YpmClient() {
                       <h4 className="text-xs font-heading font-semibold tracking-wider text-white/80 uppercase">
                         Portfolio Preferences (Rank 1 to 3) *
                       </h4>
-                      {isLoadingPortfolios && (
-                        <span className="text-[10px] text-[#38bdf8] font-heading tracking-wider flex items-center gap-1.5 uppercase">
-                          <Loader2 size={12} className="animate-spin" />
-                          Checking availability...
-                        </span>
-                      )}
                     </div>
 
                     {isLoadingPortfolios ? (
-                      <div className="bg-[#121212] border border-[#38bdf8]/20 rounded-xl p-6 flex flex-col items-center justify-center gap-3 text-center py-7">
-                        <div className="w-8 h-8 rounded-full bg-[#38bdf8]/10 flex items-center justify-center text-[#38bdf8]">
-                          <Loader2 size={18} className="animate-spin" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs font-heading font-semibold text-white tracking-wider uppercase">
-                            Fetching Available Portfolios...
-                          </p>
-                          <p className="text-[11px] text-white/40">
-                            Checking live allotment status from the secretariat
-                          </p>
+                      <div className="bg-[#121212] border border-white/5 rounded-xl p-8 flex flex-col items-center justify-center gap-4 text-center">
+                        <div className="w-10 h-10 border-[3px] border-[#38bdf8]/20 border-t-[#38bdf8] rounded-full animate-spin" />
+                        <div>
+                          <h4 className="font-heading font-bold text-white text-sm tracking-widest uppercase">
+                            Loading Portfolios
+                          </h4>
                         </div>
                       </div>
                     ) : (
@@ -1167,9 +1242,14 @@ export default function YpmClient() {
                             disabled={isPaymentVerified}
                             options={memberList}
                             value={formData.pref1}
-                            onChange={(val) => handleDropdownChange("pref1", val)}
+                            onChange={(val) =>
+                              handleDropdownChange("pref1", val)
+                            }
                             placeholder="Select Portfolio 1"
-                            selectedOtherValues={[formData.pref2, formData.pref3]}
+                            selectedOtherValues={[
+                              formData.pref2,
+                              formData.pref3,
+                            ]}
                             allottedList={allottedPortfolios}
                           />
                         </div>
@@ -1181,9 +1261,14 @@ export default function YpmClient() {
                             disabled={isPaymentVerified}
                             options={memberList}
                             value={formData.pref2}
-                            onChange={(val) => handleDropdownChange("pref2", val)}
+                            onChange={(val) =>
+                              handleDropdownChange("pref2", val)
+                            }
                             placeholder="Select Portfolio 2"
-                            selectedOtherValues={[formData.pref1, formData.pref3]}
+                            selectedOtherValues={[
+                              formData.pref1,
+                              formData.pref3,
+                            ]}
                             allottedList={allottedPortfolios}
                           />
                         </div>
@@ -1195,9 +1280,14 @@ export default function YpmClient() {
                             disabled={isPaymentVerified}
                             options={memberList}
                             value={formData.pref3}
-                            onChange={(val) => handleDropdownChange("pref3", val)}
+                            onChange={(val) =>
+                              handleDropdownChange("pref3", val)
+                            }
                             placeholder="Select Portfolio 3"
-                            selectedOtherValues={[formData.pref1, formData.pref2]}
+                            selectedOtherValues={[
+                              formData.pref1,
+                              formData.pref2,
+                            ]}
                             allottedList={allottedPortfolios}
                           />
                         </div>
@@ -1234,16 +1324,12 @@ export default function YpmClient() {
                               Registration Fee: ₹300
                             </h4>
                           </div>
-                          <p className="text-white/50 text-xs mt-1">
-                            Payment must be completed to unlock application
-                            submission.
-                          </p>
                         </div>
                         <button
                           type="submit"
                           className="w-full sm:w-auto bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-3 rounded-lg hover:bg-[#7dd3fc] transition-all shadow-md shadow-[#38bdf8]/10 cursor-pointer"
                         >
-                          PROCEED TO PAY ₹300 &rarr;
+                          PROCEED TO PAY &rarr;
                         </button>
                       </div>
                     ) : (
@@ -1625,6 +1711,7 @@ export default function YpmClient() {
                       type="button"
                       onClick={() => {
                         if (customDialog.onConfirm) customDialog.onConfirm();
+                        setCustomDialog((prev) => ({ ...prev, isOpen: false }));
                       }}
                       className="flex-1 bg-[#38bdf8] text-[#0a0a0a] font-heading font-semibold text-xs tracking-wider py-2.5 rounded-md hover:bg-[#7dd3fc] transition-all cursor-pointer"
                     >
