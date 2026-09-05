@@ -32,6 +32,16 @@ const rateLimitSubmissionLog = new Map<
 let lastCleanup = Date.now();
 const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
 
+function escapeHtml(str: any): string {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function cleanupStores() {
   const now = Date.now();
   for (const [ip, timestamps] of rateLimitStore.entries()) {
@@ -457,6 +467,7 @@ export async function POST(req: NextRequest) {
                 body: JSON.stringify({
                   from: FROM_EMAIL,
                   to: recipientEmails,
+                  reply_to: email || undefined,
                   subject: `New YPM Registration: ${name}`,
                   html: `
                     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
@@ -478,39 +489,39 @@ export async function POST(req: NextRequest) {
                           <tbody>
                             <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; width: 150px; border-right: 1px solid #e2e8f0;">Full Name</td>
-                              <td style="padding: 10px 14px; font-weight: 700; color: #0f172a;">${name}</td>
+                              <td style="padding: 10px 14px; font-weight: 700; color: #0f172a;">${escapeHtml(name)}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Email Address</td>
-                              <td style="padding: 10px 14px;"><a href="mailto:${email}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${email}</a></td>
+                              <td style="padding: 10px 14px;"><a href="mailto:${escapeHtml(email)}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${escapeHtml(email)}</a></td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">WhatsApp Number</td>
-                              <td style="padding: 10px 14px;"><a href="https://wa.me/${(whatsapp || "").replace(/[^0-9]/g, "")}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${whatsapp}</a></td>
+                              <td style="padding: 10px 14px;"><a href="https://wa.me/${escapeHtml(whatsapp || "").replace(/[^0-9]/g, "")}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${escapeHtml(whatsapp)}</a></td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Institute / College</td>
-                              <td style="padding: 10px 14px; color: #334155;">${institute || "N/A"}</td>
+                              <td style="padding: 10px 14px; color: #334155;">${escapeHtml(institute || "N/A")}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">1st Preference</td>
-                              <td style="padding: 10px 14px; font-weight: 700; color: #0284c7;">${pref1}</td>
+                              <td style="padding: 10px 14px; font-weight: 700; color: #0284c7;">${escapeHtml(pref1)}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">2nd Preference</td>
-                              <td style="padding: 10px 14px; color: #334155;">${pref2}</td>
+                              <td style="padding: 10px 14px; color: #334155;">${escapeHtml(pref2)}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">3rd Preference</td>
-                              <td style="padding: 10px 14px; color: #334155;">${pref3}</td>
+                              <td style="padding: 10px 14px; color: #334155;">${escapeHtml(pref3)}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e2e8f0;">
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Transaction ID / Receipt</td>
-                              <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #0f172a; word-break: break-all;">${resolvedTransactionId}</td>
+                              <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #0f172a; word-break: break-all;">${escapeHtml(resolvedTransactionId)}</td>
                             </tr>
                             <tr>
                               <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0; vertical-align: top;">MUN Experience</td>
-                              <td style="padding: 10px 14px; color: #334155; white-space: pre-wrap; line-height: 1.5;">${experience || "None specified"}</td>
+                              <td style="padding: 10px 14px; color: #334155; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(experience || "None specified")}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -639,8 +650,7 @@ export async function GET(req: NextRequest) {
           : [],
         govCount: typeof result.govCount === "number" ? result.govCount : 0,
         oppCount: typeof result.oppCount === "number" ? result.oppCount : 0,
-        sideLimit:
-          typeof result.sideLimit === "number" ? result.sideLimit : 25,
+        sideLimit: typeof result.sideLimit === "number" ? result.sideLimit : 25,
         isGovCapped: Boolean(result.isGovCapped),
         isOppCapped: Boolean(result.isOppCapped),
         isClosed: Boolean(result.isClosed || result.closed),
