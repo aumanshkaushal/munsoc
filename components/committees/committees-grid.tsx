@@ -44,7 +44,7 @@ export default function CommitteesGrid() {
                     <span>&bull;</span>
                     <span className="flex items-center gap-1 text-white/80">
                       <Calendar size={13} className="text-[#38bdf8]" />
-                      10 October 2026 (Tentative)
+                      10 October 2026
                     </span>
                   </div>
                 </div>
@@ -83,7 +83,7 @@ export default function CommitteesGrid() {
                     <div className="flex items-center gap-2 text-[#38bdf8]">
                       <Sparkles size={18} />
                       <h4 className="font-heading font-semibold text-xs text-white tracking-wider uppercase">
-                        Agenda &amp; Topics
+                        Agenda
                       </h4>
                     </div>
                     <p className="text-white/55 text-xs leading-relaxed">
@@ -102,7 +102,7 @@ export default function CommitteesGrid() {
                       href="/committees/ypm"
                       className="bg-[#38bdf8] text-[#0a0a0a] font-heading font-bold text-xs tracking-widest px-6 py-2.5 rounded-lg hover:bg-[#7dd3fc] transition-all shadow-lg shadow-[#38bdf8]/20 flex items-center gap-2 whitespace-nowrap"
                     >
-                      REGISTER / PAY NOW
+                      REGISTER
                       <ArrowRight size={14} />
                     </Link>
                   </motion.div>
