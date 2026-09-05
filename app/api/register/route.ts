@@ -447,84 +447,99 @@ export async function POST(req: NextRequest) {
             .filter((e) => e.length > 0);
 
           if (recipientEmails.length > 0) {
-            fetch("https://api.resend.com/emails", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${RESEND_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                from: FROM_EMAIL,
-                to: recipientEmails,
-                subject: `New YPM Registration: ${name}`,
-                html: `
-                  <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <div style="background-color: #0f172a; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; border-top: 4px solid #0284c7;">
-                      <img src="https://munsoc.opensourcenitj.com/munsoc-white-blue.svg" alt="MUNSoC NITJ" width="48" height="48" style="display: block; margin: 0 auto 10px auto; border-radius: 8px;" />
-                      <h2 style="color: #ffffff; font-size: 18px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px;">MUNSoC NIT Jalandhar</h2>
-                      <p style="color: #38bdf8; font-size: 12px; margin: 4px 0 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;">Youth Parliament (YPM)</p>
+            try {
+              const resendRes = await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${RESEND_API_KEY}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  from: FROM_EMAIL,
+                  to: recipientEmails,
+                  subject: `New YPM Registration: ${name}`,
+                  html: `
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                      <div style="background-color: #0f172a; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; border-top: 4px solid #0284c7;">
+                        <img src="https://munsoc.opensourcenitj.com/munsoc-white-blue.svg" alt="MUNSoC NITJ" width="48" height="48" style="display: block; margin: 0 auto 10px auto; border-radius: 8px;" />
+                        <h2 style="color: #ffffff; font-size: 18px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px;">MUNSoC NIT Jalandhar</h2>
+                        <p style="color: #38bdf8; font-size: 12px; margin: 4px 0 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;">Youth Parliament (YPM)</p>
+                      </div>
+
+                      <div style="padding: 20px 8px 0 8px;">
+                        <h3 style="color: #0f172a; font-size: 16px; font-weight: 700; margin: 0 0 12px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">
+                          New Registration Submission Received
+                        </h3>
+                        <p style="font-size: 14px; color: #475569; margin: 0 0 16px 0; line-height: 1.5;">
+                          A new delegate application has been submitted for the <strong>Youth Parliament (YPM)</strong>. Below are the registration details:
+                        </p>
+
+                        <table style="border-collapse: collapse; width: 100%; font-size: 13px; margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                          <tbody>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; width: 150px; border-right: 1px solid #e2e8f0;">Full Name</td>
+                              <td style="padding: 10px 14px; font-weight: 700; color: #0f172a;">${name}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Email Address</td>
+                              <td style="padding: 10px 14px;"><a href="mailto:${email}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${email}</a></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">WhatsApp Number</td>
+                              <td style="padding: 10px 14px;"><a href="https://wa.me/${(whatsapp || "").replace(/[^0-9]/g, "")}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${whatsapp}</a></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Institute / College</td>
+                              <td style="padding: 10px 14px; color: #334155;">${institute || "N/A"}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">1st Preference</td>
+                              <td style="padding: 10px 14px; font-weight: 700; color: #0284c7;">${pref1}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">2nd Preference</td>
+                              <td style="padding: 10px 14px; color: #334155;">${pref2}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">3rd Preference</td>
+                              <td style="padding: 10px 14px; color: #334155;">${pref3}</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Transaction ID / Receipt</td>
+                              <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #0f172a; word-break: break-all;">${resolvedTransactionId}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0; vertical-align: top;">MUN Experience</td>
+                              <td style="padding: 10px 14px; color: #334155; white-space: pre-wrap; line-height: 1.5;">${experience || "None specified"}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                      </div>
+
+                      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
+                        MUNSoC NITJ Web Platform Registration System
+                      </div>
                     </div>
-
-                    <div style="padding: 20px 8px 0 8px;">
-                      <h3 style="color: #0f172a; font-size: 16px; font-weight: 700; margin: 0 0 12px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">
-                        New Registration Submission Received
-                      </h3>
-                      <p style="font-size: 14px; color: #475569; margin: 0 0 16px 0; line-height: 1.5;">
-                        A new delegate application has been submitted for the <strong>Youth Parliament (YPM)</strong>. Below are the registration details:
-                      </p>
-
-                      <table style="border-collapse: collapse; width: 100%; font-size: 13px; margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
-                        <tbody>
-                          <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; width: 150px; border-right: 1px solid #e2e8f0;">Full Name</td>
-                            <td style="padding: 10px 14px; font-weight: 700; color: #0f172a;">${name}</td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Email Address</td>
-                            <td style="padding: 10px 14px;"><a href="mailto:${email}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${email}</a></td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">WhatsApp Number</td>
-                            <td style="padding: 10px 14px;"><a href="https://wa.me/${(whatsapp || "").replace(/[^0-9]/g, "")}" style="color: #0284c7; text-decoration: none; font-weight: 600;">${whatsapp}</a></td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Institute / College</td>
-                            <td style="padding: 10px 14px; color: #334155;">${institute || "N/A"}</td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">1st Preference</td>
-                            <td style="padding: 10px 14px; font-weight: 700; color: #0284c7;">${pref1}</td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">2nd Preference</td>
-                            <td style="padding: 10px 14px; color: #334155;">${pref2}</td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">3rd Preference</td>
-                            <td style="padding: 10px 14px; color: #334155;">${pref3}</td>
-                          </tr>
-                          <tr style="border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0;">Transaction ID / Receipt</td>
-                            <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #0f172a; word-break: break-all;">${resolvedTransactionId}</td>
-                          </tr>
-                          <tr>
-                            <td style="padding: 10px 14px; font-weight: 600; color: #64748b; border-right: 1px solid #e2e8f0; vertical-align: top;">MUN Experience</td>
-                            <td style="padding: 10px 14px; color: #334155; white-space: pre-wrap; line-height: 1.5;">${experience || "None specified"}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                    </div>
-
-                    <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
-                      MUNSoC NITJ Web Platform Registration System
-                    </div>
-                  </div>
-                `,
-              }),
-            }).catch((err) =>
-              console.error("[MUNSoC Register] Resend fetch failed:", err),
-            );
+                  `,
+                }),
+                signal: AbortSignal.timeout(10000),
+              });
+              const resendData = await resendRes.json();
+              if (!resendRes.ok) {
+                console.error(
+                  "[MUNSoC Register] Resend API error:",
+                  resendData,
+                );
+              } else {
+                console.log(
+                  "[MUNSoC Register] Resend email dispatched successfully:",
+                  resendData.id,
+                );
+              }
+            } catch (err) {
+              console.error("[MUNSoC Register] Resend fetch failed:", err);
+            }
           }
         } catch (emailErr) {
           console.error(
