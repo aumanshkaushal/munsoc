@@ -1,57 +1,27 @@
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
-import HistoryVision from "@/components/about/history-vision";
+import type { Metadata } from "next";
 import OrganizingCommittee from "@/components/about/organizing-committee";
 import CommitteeMembers from "@/components/about/committee-members";
-import { Reveal } from "@/components/motion";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description:
-    "Learn about the history, vision, and team behind MUNSoC NITJ - the Model United Nations Society at NIT Jalandhar.",
-  alternates: {
-    canonical: "https://munsoc.opensourcenitj.com/about",
-  },
+  description: "The people and history behind the Model United Nations Society at NIT Jalandhar.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#121212] text-white">
-      <Navbar />
-
-      <section className="relative pt-32 pb-20 px-4 bg-[#0a0a0a] overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none overflow-hidden">
-          <span
-            className="font-heading font-bold text-white/[0.03] tracking-tighter whitespace-nowrap"
-            style={{ fontSize: "clamp(5rem, 20vw, 14rem)" }}
-            aria-hidden
-          >
-            MUN
-          </span>
-        </div>
-        <Reveal className="relative z-10 max-w-2xl mx-auto text-center">
-          <h1
-            className="font-display text-white text-balance"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            ABOUT MUNSOC NITJ
-          </h1>
-          <p className="mt-4 text-white/70 text-sm leading-relaxed text-pretty max-w-lg mx-auto">
-            Fostering diplomacy, intellectual discourse, and global leadership
-            among the brightest minds at Dr. B.R. Ambedkar National Institute of
-            Technology.
-          </p>
-        </Reveal>
+    <main className="site-container page-flow">
+      <div className="page-intro">
+        <p className="editorial-label">NIT Jalandhar / Est. 2024</p>
+        <h1 className="editorial-title page-title">About the society</h1>
+        <p className="page-description">We&apos;re the student society for Model United Nations, debate, and public speaking at NIT Jalandhar.</p>
+      </div>
+      <section aria-labelledby="society-history" className="grid gap-5 border-t border-border py-8 sm:grid-cols-[1fr_2fr] sm:gap-8">
+        <h2 id="society-history" className="editorial-title text-4xl">Our history</h2>
+        <p className="max-w-prose leading-relaxed text-muted-foreground">Students from the batches of 2025 and 2026 founded the society in 2024 and held a Youth Parliament in its first year. After a pause, a new team revived it as MUNSoC NITJ.</p>
       </section>
-
-      <HistoryVision />
       <OrganizingCommittee />
       <CommitteeMembers />
-      <Footer />
     </main>
   );
 }

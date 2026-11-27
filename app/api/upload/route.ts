@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadRefMap } from "../shared";
 import { randomUUID } from "crypto";
+import { youthParliament2026 } from "@/lib/events";
 
 export async function POST(req: NextRequest) {
+  if (!youthParliament2026.registrationOpen) {
+    return NextResponse.json(
+      { success: false, isClosed: true, error: "Youth Parliament 2026 has concluded." },
+      { status: 410 },
+    );
+  }
+
   try {
     const { image } = await req.json();
 

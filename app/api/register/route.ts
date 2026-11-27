@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { uploadRefMap } from "../shared";
+import { youthParliament2026 } from "@/lib/events";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -282,6 +283,13 @@ async function sendRateLimitAlert(
 }
 
 export async function POST(req: NextRequest) {
+  if (!youthParliament2026.registrationOpen) {
+    return NextResponse.json(
+      { success: false, isClosed: true, error: "Youth Parliament 2026 has concluded." },
+      { status: 410 },
+    );
+  }
+
   try {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -692,6 +700,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  if (!youthParliament2026.registrationOpen) {
+    return NextResponse.json({ success: true, isClosed: true });
+  }
+
   try {
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

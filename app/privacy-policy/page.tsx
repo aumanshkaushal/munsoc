@@ -1,15 +1,10 @@
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
-import { Reveal } from "@/components/motion";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "Privacy Policy for MUNSoC NITJ - how we collect, use, and protect your personal information.",
-  alternates: {
-    canonical: "https://munsoc.opensourcenitj.com/privacy-policy",
-  },
+  alternates: { canonical: "/privacy-policy" },
 };
 
 const sections = [
@@ -66,95 +61,20 @@ Instagram: @nitjmunsociety`,
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-[#121212] text-white">
-      <Navbar />
-
-      <section className="relative pt-32 pb-16 px-4 bg-[#0a0a0a] overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none overflow-hidden">
-          <span
-            className="font-heading font-bold text-white/[0.025] tracking-tighter whitespace-nowrap"
-            style={{ fontSize: "clamp(5rem, 18vw, 13rem)" }}
-            aria-hidden
-          >
-            PRIVACY
-          </span>
-        </div>
-        <Reveal className="relative z-10 max-w-2xl mx-auto text-center">
-          <div className="inline-block border border-white/10 text-white/60 text-[10px] font-heading tracking-[0.2em] px-3 py-1 rounded-sm mb-5">
-            LEGAL
-          </div>
-          <h1
-            className="font-display text-white text-balance"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            PRIVACY POLICY
-          </h1>
-          <p className="mt-4 text-white/70 text-sm leading-relaxed text-pretty max-w-lg mx-auto">
-            MUNSoC NITJ is committed to protecting your personal information and
-            your right to privacy.
-          </p>
-          <p className="mt-3 text-white/55 text-xs font-heading tracking-widest">
-            EFFECTIVE DATE: JUNE 2026
-          </p>
-        </Reveal>
-      </section>
-
-      <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto">
-          <Reveal>
-            <p className="text-white/70 text-sm leading-relaxed mb-14 text-pretty border-l-2 border-[#38bdf8]/40 pl-5">
-              This Privacy Policy describes how MUNSoC NITJ (&ldquo;we&rdquo;,
-              &ldquo;our&rdquo;, or &ldquo;the society&rdquo;) collects, uses,
-              and protects information you provide when you interact with our
-              website at{" "}
-              <span className="text-[#38bdf8]">munsoc.opensourcenitj.com</span>.
-              By using this site, you agree to the terms of this policy.
-            </p>
-          </Reveal>
-
-          <div className="flex flex-col gap-12">
-            {sections.map((section, i) => (
-              <Reveal key={section.title} delay={i * 0.04}>
-                <div className="group">
-                  <div className="flex items-start gap-4 mb-4">
-                    <span className="text-[#38bdf8]/40 text-[10px] font-heading tracking-widest mt-1 w-6 shrink-0 text-right">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h2
-                      className="font-display text-white"
-                      style={{
-                        fontSize: "clamp(1rem, 2.5vw, 1.3rem)",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      {section.title.toUpperCase()}
-                    </h2>
-                  </div>
-                  <div className="ml-10 border-l border-white/6 pl-6">
-                    <p className="text-white/70 text-sm leading-relaxed whitespace-pre-line text-pretty">
-                      {section.content}
-                    </p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={0.2}>
-            <div className="mt-16 pt-10 border-t border-white/8 text-center">
-              <p className="text-white/55 text-xs font-heading tracking-widest">
-                &copy; 2026 MUNSOC NIT JALANDHAR &nbsp;&middot;&nbsp; ALL RIGHTS
-                RESERVED
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      <Footer />
+    <main className="site-container page-flow">
+      <div className="page-intro">
+        <p className="editorial-label">Effective June 2026</p>
+        <h1 className="editorial-title page-title">Privacy policy</h1>
+        <p className="page-description">This policy describes how MUNSoC NITJ collects, uses, and protects information you provide when you use this website. By using this site, you agree to the terms of this policy.</p>
+      </div>
+      <div>
+        {sections.map((section) => (
+          <section key={section.title} className="border-t border-border py-6">
+            <h2 className="editorial-title mb-3 text-3xl">{section.title}</h2>
+            <p className="max-w-prose text-sm leading-relaxed whitespace-pre-line text-muted-foreground">{section.content}</p>
+          </section>
+        ))}
+      </div>
     </main>
   );
 }
